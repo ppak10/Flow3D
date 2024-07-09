@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "Flow3D"
+version = "0.0.1"
+authors = [
+  { name="Peter Pak", email="ppak10@gmail.com" },
+]
+description = "Python wrapper for Flow3D"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/ppak10/Flow3D"
+Issues = "https://github.com/ppak10/Flow3D/issues"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+        "test",
+]
