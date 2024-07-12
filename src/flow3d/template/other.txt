@@ -1,0 +1,284 @@
+&props
+   units='cgs', remark='base units',
+   tunits='k', remark='temperature units',
+   munits='g', remark='mass units',
+   lunits='cm', remark='length units',
+   timunits='s', remark='time units',
+   cunits='scoul', remark='charge units',
+   gamma=1.4, remark='gamma',
+   mu1=0.072, remark='viscosity',
+   fluid1='Ni-IN_718-Mills data', remark='material name',
+   cv1=7.2e+6, remark='specific heat',
+   tstar=1608.15, remark='reference temperature',
+   tl1=1608.15, remark='liquidus temperature',
+   ts1=1523.15, remark='solidus temperature',
+   clht1=2.1e+9, remark='latent heat fusion',
+   cvs1=6.84e+6, remark='specific heat',
+   thcs1=2.9445e+6, remark='thermal conductivity',
+   pv1=1e6, remark='saturation pressure',
+   tv1=2500, remark='saturation temperature',
+   clhv1=6.3e10, remark='latent heat of vaporization',
+   rsize=0.01, remark='accommodation coefficient',
+   cvvap=1.25e7, remark='vapor specific heat',
+   tvexp=0.0000793651, remark='exponent for T-P curve',
+   rhof=7.40197, remark='density',
+   sigma=1882, remark='surface tension coefficient',
+   thc1=2.9598e+6, remark='thermal conductivity',
+   isigma=1,
+   irhof=1,
+   ithc1=1,
+   icv1=1,
+   ifst=2, remark='solid Fraction tabular flag',
+   imu1=1,
+   ipgauge=0, remark='pressure type',
+/
+
+&scalar
+   nsc=0,
+/
+
+&CHM
+/
+
+&bcdata
+   remark='!! Boundary condition X Min',
+   ibct(1)=2,
+   tbct(1, 1)=293,
+   ihtbct(1)=0,
+
+   remark='!! Boundary condition X Max',
+   ibct(2)=2,
+   tbct(1, 2)=293,
+   ihtbct(2)=0,
+
+   remark='!! Boundary condition Y Min',
+   ibct(3)=2,
+   tbct(1, 3)=293,
+   ihtbct(3)=0,
+
+   remark='!! Boundary condition Y Max',
+   ibct(4)=2,
+   tbct(1, 4)=293,
+   ihtbct(4)=0,
+
+   remark='!! Boundary condition Z Min',
+   ibct(5)=2,
+   tbct(1, 5)=293,
+   ihtbct(5)=0,
+
+   remark='!! Boundary condition Z Max',
+   ibct(6)=5,
+   pbct(1, 6)=1.0e+05,
+   fbct(1, 6)=0,
+   tbct(1, 6)=293,
+   ihtbct(6)=0,
+
+/
+
+&mesh
+   MeshName='Mesh block 1',
+   size=0.0005, remark='Size of Cells',
+
+   px(1)=0.05, remark='Location of the Mesh Plane in the X Direction',
+   px(2)=0.15, remark='Location of the Mesh Plane in the X Direction',
+
+   py(1)=0, remark='Location of the Mesh Plane in the Y Direction',
+   py(2)=0.06, remark='Location of the Mesh Plane in the Y Direction',
+
+   pz(1)=0, remark='Location of the Mesh Plane in the Z Direction',
+   pz(2)=0.055, remark='Location of the Mesh Plane in the Z Direction',
+
+/
+
+&obs
+   nobs=0, remark='number of components',
+
+
+/
+
+&fl
+   nfls=1,
+
+   remark='!! FluidRegion 1',
+
+   remark='Material 1',
+   fluidRegionName(1)='Region 1', remark='Fluid Region Name',
+   ifdis(1)=0, remark='Geometry',
+   fzh(1)=0.04, remark='Z High',
+   treg(1)=293, remark='Fluid Tempearture',
+
+   remark= 'Void Pointer Common Parameters',
+
+   remark='!! Region Pointer common parameters',
+   pvoid=1.0e+06, remark='Default Void Initial Vapor Pressure',
+   iflinittyp=0, remark='Fluid Initialization',
+/
+
+&bf
+/
+
+&motn
+/
+
+&grafic
+   anmtyp(1)='tn',
+   anmtyp(2)='vel',
+/
+
+&RENDERSPACE
+/
+
+&header
+   project='Tutorial',
+   version='double',
+   nprocs=0,
+/
+
+&parts
+   remark='!! Fluid Particle Class',
+   ipliquid_species=0,
+
+   remark='!! Mass Particle Class',
+   ipmass_species=0,
+
+   remark='!! Particle Blocks',
+   npxyz=0,
+
+   remark='!! Particle Sources',
+   ippkt=0,
+
+
+/
+
+&DETAILS
+   f3d_product_name='FLOW-3D',
+   f3d_version_number='12.0.2',
+   created='2022 Nov 03 13:46',
+   modified='2022 Nov 03 14:13',
+/ 
+
+&weld
+   nlbeam=1,
+   ilbeam=2, remark='surface detection method',
+
+   remark='time index',
+   timlbm(1)=0.0,
+   timlbm(2)=0.0005,
+
+   remark= 'Laser 1',
+
+   xb0lbm(1)=0.06, remark='X position',
+   yb0lbm(1)=0.03, remark='Y position',
+   zb0lbm(1)=0.96, remark='Z position',
+
+   r0lbm(1)=0.01, remark='lens radius',
+   rflbm(1)=0.003, remark='spot radius',
+   dlflbm(1)=1, remark='focal distance',
+   rblbm(1)=0.0021213203, remark='Gauss dist. (rb)',
+   rzlbm(1)=-1, remark='Z direction',
+   zspin0(1)=-0.0174532925, remark='Initial Rotation',
+
+   remark= 'power',
+   powlbm(1,1)=4e9,
+   powlbm(2,1)=4e9,
+
+   remark= 'U velocity',
+   utlbm(1,1)=300.0,
+   utlbm(2,1)=300.0,
+
+   avprslbm=10000, remark='evaporation pressure pscoefficient A',
+   bvprslbm=5.0399986896, remark='evaporation pressure pscoefficient B',
+   cbmengy=0.35, remark='temperature dependent fluid-absorption rate',
+   ivpropt=1, remark='evaporation direction option',
+
+
+
+
+/
+
+#start tables:
+#fluid1:
+#mu1t
+1609.15	0.072
+1673.15	0.0646
+1773.15	0.0531
+#end mu1t
+#sigma
+1609.15	1882
+1673.15	1877
+1773.15	1866
+1873.15	1855
+#end sigma
+#rhof
+298.15	8.19
+373.15	8.16
+473.15	8.118
+573.15	8.079
+673.15	8.04
+773.15	8.001
+873.15	7.962
+973.15	7.925
+1073.15	7.884
+1173.15	7.845
+1273.15	7.806
+1373.15	7.767
+1443.15	7.727
+1609.15	7.4
+1673.15	7.34
+1773.15	7.25
+1873.15	7.16
+#end rhof
+#thc1
+298.15	890000
+373.15	1.08e+6
+473.15	1.29e+6
+573.15	1.52e+6
+673.15	1.74e+6
+773.15	1.87e+6
+873.15	2.08e+6
+973.15	2.19e+6
+1073.15	2.69e+6
+1173.15	2.58e+6
+1273.15	2.67e+6
+1373.15	2.83e+6
+1443.15	2.93e+6
+1609.15	2.96e+6
+1673.15	2.96e+6
+1773.15	2.96e+6
+1873.15	2.96e+6
+#end thc1
+#cv1
+298.15	4.35e+6
+373.15	4.55e+6
+473.15	4.79e+6
+573.15	4.97e+6
+673.15	5.15e+6
+773.15	5.27e+6
+873.15	5.58e+6
+973.15	5.68e+6
+1073.15	6.8e+6
+1173.15	6.4e+6
+1273.15	6.2e+6
+1373.15	6.4e+6
+1443.15	6.5e+6
+1609.15	7.2e+6
+1673.15	7.2e+6
+1773.15	7.2e+6
+1873.15	7.2e+6
+#end cv1
+#fs
+1523.15	1
+1536.15	0.95
+1550.15	0.9
+1564.15	0.8
+1573.15	0.7
+1583.15	0.6
+1588.15	0.5
+1593.15	0.4
+1597.65	0.3
+1601.15	0.2
+1605.15	0.1
+1608.15	0
+#end fs
+#end fluid1
+#end start tables

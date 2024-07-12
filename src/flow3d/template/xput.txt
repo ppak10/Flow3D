@@ -1,0 +1,21 @@
+&xput
+   remark='!! Remarks beginning with "!! " are automatically added and removed by FLOW-3D.',
+   remark='!! Do not begin any user added remarks with with "!! ". They will be removed',
+   twfin=0.0005, remark='Simulation Finish Time',
+   itb=1,
+   ifenrg=2,
+   ifvisc=1,
+   ifsft=1,
+   imphtc=1,
+   ifvof=6,
+   ifdynconv=1,
+   iphchg=1,
+   ifrho=1,
+   ifthexp=1,
+   gz=-980,
+   ifsld=1,
+   hflv1=1.0e+05, remark='Heat Transfer to Void Type 1',
+   tedit(1)=0,
+   tpltd(1)=5e-06,
+/
+
