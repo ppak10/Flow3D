@@ -126,7 +126,7 @@
 
  &mesh
     MeshName='Mesh Block 1',
-    size=0.002, remark='Size of Cells',
+    size=<MESH_SIZE>, remark='Size of Cells',
 
     px(1)=0.05, remark='Location of the Mesh Plane in the X Direction',
     px(2)=0.3, remark='Location of the Mesh Plane in the X Direction',
@@ -246,16 +246,16 @@
     yb0lbm(1)=0.03, remark='Y position',
     zb0lbm(1)=1.0, remark='Z position',
 
-    r0lbm(1)=0.005, remark='lens radius',
-    rflbm(1)=0.005, remark='spot radius',
+    r0lbm(1)=<LENS_RADIUS>, remark='lens radius',
+    rflbm(1)=<SPOT_RADIUS>, remark='spot radius',
     dlflbm(1)=40, remark='focal distance',
     rblbm(1)=0.0035355339, remark='Gauss dist. (rb)',
     rzlbm(1)=-1, remark='Z direction',
 
 
-    powlbm(1,1)=insertpower, remark= 'power',
+    powlbm(1,1)=<POWER>, remark= 'power',
 
-    utlbm(1,1)=insertvel, remark= 'U velocity',
+    utlbm(1,1)=<VELOCITY>, remark= 'U velocity',
 
     avprslbm=151950, remark='evaporation pressure pscoefficient A',
     bvprslbm=8.0144971996, remark='evaporation pressure pscoefficient B',

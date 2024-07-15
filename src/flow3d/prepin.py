@@ -43,9 +43,9 @@ class Prepin():
         @param id: Material Identifier
         @param power: Laser Power (W)
         @param velocity: Scan Velocity (m/s)
-        @param mesh_size: Mesh Size (m) -> defaults to 0.002 m
-        @param lens_radius: Lens Radius (m) -> defaults to 0.005 m
-        @param spot_radius: Spot Radius (m) -> defaults to 0.005 m
+        @param mesh_size: Mesh Size (cm) -> defaults to 0.002 cm (20 µm)
+        @param lens_radius: Lens Radius (cm) -> defaults to 0.005 cm (50 µm)
+        @param spot_radius: Spot Radius (cm) -> defaults to 0.005 cm (50 µm)
         @param id_type: Identifier Type -> defaults to 'UNS'
         @return
         """
@@ -133,28 +133,30 @@ Spot Radius: {spot_radius} m
         else:
             raise Exception(f"`velocity` input must be either int or float or list of int or float")
 
-        # # Compile `prepin` files.
-        # for power in powers:
-        #     for velocity in velocities:
-        #         # Update Template File
-        #         power_cgs = power * 1e7
-        #         velocity_cgs = velocity * 100
+        # Compile `prepin` files.
+        for power in powers:
+            for velocity in velocities:
+                # Update Template File
+                power_cgs = power * 1e7
+                velocity_cgs = velocity * 100
 
-        #         power_text = str(power_cgs/1e9) + "e9"
-        #         velocity_text = f"{velocity_cgs:.2f}"
+                power_text = str(power_cgs/1e9) + "e9"
+                velocity_text = f"{velocity_cgs:.2f}"
 
-        #         with open(template_file_path) as file:
-        #             template = file.read()
+                with open(template_file_path) as file:
+                    template = file.read()
 
-        #         content = template.replace("insertpower", power_text) 
-        #         content = content.replace("insertvel", velocity_text) 
-        #         content = content.replace("insertmesh", str(mesh_size)) 
+                content = template.replace("<POWER>", power_text) 
+                content = content.replace("<VELOCITY>", velocity_text) 
+                content = content.replace("<LENS_RADIUS>", f"{lens_radius}") 
+                content = content.replace("<SPOT_RADIUS>", f"{spot_radius}") 
+                content = content.replace("<MESH_SIZE>", str(mesh_size)) 
 
-        #         # Save Updated Template File
-        #         simulation_filename = f"prepin.power_{power}_W_velocity_{velocity}_m_per_s_mesh_size_{mesh_size}_cm"
-        #         simulation_file_path = os.path.join(simulation_folder_path, simulation_filename)
-        #         with open(simulation_file_path, "w") as file:
-        #             file.write(content)
-        #         if self.verbose: print(f"simulation_file_path: {simulation_file_path}")
+                # # Save Updated Template File
+                # simulation_filename = f"prepin.power_{power}_W_velocity_{velocity}_m_per_s_mesh_size_{mesh_size}_cm"
+                # simulation_file_path = os.path.join(self.prepin_dir_path, simulation_filename)
+                # with open(simulation_file_path, "w") as file:
+                #     file.write(content)
+                # if self.verbose: print(f"simulation_file_path: {simulation_file_path}")
 
-        # return simulation_folder_path
+        return self.prepin_dir_path
