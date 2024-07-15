@@ -96,6 +96,15 @@ def test_build_from_template_argument_types(p):
 
     # Valid Inputs
     for power in [100, 100.0, [100, 200], [100.0, 200.0]]:
-        p.build_from_template("R56400", power, 0, template_id_type="UNS", keep_in_memory = True)
+        simulations = p.build_from_template("R56400", power, 0, template_id_type="UNS", keep_in_memory = True)
+        if isinstance(power, list):
+            assert len(simulations) == len(power)
+        else:
+            assert len(simulations) == 1
+
     for velocity in [1, 1.0, [1, 2], [1.0, 2.0]]:
-        p.build_from_template("R56400", 0, velocity, template_id_type="UNS", keep_in_memory = True)
+        simulations = p.build_from_template("R56400", 0, velocity, template_id_type="UNS", keep_in_memory = True)
+        if isinstance(velocity, list):
+            assert len(simulations) == len(velocity)
+        else:
+            assert len(simulations) == 1

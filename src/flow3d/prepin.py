@@ -3,6 +3,8 @@ import os
 import pandas as pd
 import warnings
 
+from flow3d.simulation import Simulation
+
 template_id_types = ["UNS"]
 
 class Prepin():
@@ -30,9 +32,9 @@ class Prepin():
         template_id,
         power,
         velocity,
-        mesh_size = 0.002,
-        lens_radius = 0.005,
-        spot_radius = 0.005,
+        mesh_size = 2E-5,
+        lens_radius = 5E-5,
+        spot_radius = 5E-5,
         template_id_type = "UNS",
         keep_in_memory = False,
     ):
@@ -43,9 +45,9 @@ class Prepin():
         @param id: Material Identifier
         @param power: Laser Power (W)
         @param velocity: Scan Velocity (m/s)
-        @param mesh_size: Mesh Size (cm) -> defaults to 0.002 cm (20 µm)
-        @param lens_radius: Lens Radius (cm) -> defaults to 0.005 cm (50 µm)
-        @param spot_radius: Spot Radius (cm) -> defaults to 0.005 cm (50 µm)
+        @param mesh_size: Mesh Size (m) -> defaults to 2E-5 m (20 µm)
+        @param lens_radius: Lens Radius (cm) -> defaults to 5E-5 (50 µm)
+        @param spot_radius: Spot Radius (cm) -> defaults to 5E-5 (50 µm)
         @param id_type: Identifier Type -> defaults to 'UNS'
         @return
         """
@@ -134,29 +136,44 @@ Spot Radius: {spot_radius} m
             raise Exception(f"`velocity` input must be either int or float or list of int or float")
 
         # Compile `prepin` files.
+        simulations = []
         for power in powers:
             for velocity in velocities:
+
+                s = Simulation()
+                s.set_process_parameters(
+                    power,
+                    velocity,
+                    mesh_size,
+                    lens_radius,
+                    spot_radius,
+                )
+
                 # Update Template File
-                power_cgs = power * 1e7
-                velocity_cgs = velocity * 100
-
-                power_text = str(power_cgs/1e9) + "e9"
-                velocity_text = f"{velocity_cgs:.2f}"
-
                 with open(template_file_path) as file:
-                    template = file.read()
+                    t = file.read()
 
-                content = template.replace("<POWER>", power_text) 
-                content = content.replace("<VELOCITY>", velocity_text) 
-                content = content.replace("<LENS_RADIUS>", f"{lens_radius}") 
-                content = content.replace("<SPOT_RADIUS>", f"{spot_radius}") 
-                content = content.replace("<MESH_SIZE>", str(mesh_size)) 
+                t = t.replace("<POWER>", str(s.power_cgs)) 
+                t = t.replace("<VELOCITY>", str(s.velocity_cgs)) 
+                t = t.replace("<LENS_RADIUS>", str(s.lens_radius_cgs)) 
+                t = t.replace("<SPOT_RADIUS>", str(s.spot_radius_cgs)) 
+                t = t.replace("<MESH_SIZE>", str(s.mesh_size_cgs))
 
-                # # Save Updated Template File
-                # simulation_filename = f"prepin.power_{power}_W_velocity_{velocity}_m_per_s_mesh_size_{mesh_size}_cm"
-                # simulation_file_path = os.path.join(self.prepin_dir_path, simulation_filename)
-                # with open(simulation_file_path, "w") as file:
-                #     file.write(content)
-                # if self.verbose: print(f"simulation_file_path: {simulation_file_path}")
+                s.prepin = t
+                simulations.append(s)
 
-        return self.prepin_dir_path
+                # Does not write output file if `keep_in_memory` is marked as
+                # `True` in either argument or initialized.
+                if not keep_in_memory and not self.keep_in_memory:
+
+                    # Save Updated Template File
+                    prepin_filename = f"prepin.{s.name}"
+                    prepin_file_path = os.path.join(self.prepin_dir_path, prepin_filename)
+
+                    with open(prepin_file_path, "w") as file:
+                        file.write(t)
+                    if self.verbose:
+                        print(f"prepin_file_path: {prepin_file_path}")
+
+        return simulations 
+
