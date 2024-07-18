@@ -41,7 +41,6 @@ class Simulation():
 
             # Generate Name using specific version.
             self.name = getattr(self, f"generate_name_v{self.version}")()
-            # self.name = self[f"generate_name_v{self.version}"]()
 
             return result
 

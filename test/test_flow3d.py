@@ -38,7 +38,6 @@ def test_init(f3d):
     assert f3d.job_dir_path == None 
 
     # Inherited prepin init values.
-    assert f3d.templates_dir_path == os.path.join(f3d.current_dir, "template")
     assert f3d.verbose == False
 
     assert f3d.prepin_dir_path == prepin_dir

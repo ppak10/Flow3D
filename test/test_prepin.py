@@ -27,7 +27,6 @@ def test_init(p):
     Tests initialization of variables for Prepin class
     """
 
-    assert p.templates_dir_path == os.path.join(p.current_dir, "template")
     assert p.keep_in_memory == False
     assert p.verbose == True
     assert p.prepin_dir == test_prepin_dir

@@ -1,9 +1,9 @@
-import numpy as np
 import os
-import pandas as pd
 import warnings
 
 from flow3d.simulation import Simulation
+from flow3d import data
+from importlib.resources import files
 
 template_id_types = ["UNS"]
 
@@ -19,10 +19,10 @@ class Prepin():
         verbose = True,
     ):
         self.current_dir = os.path.dirname(__file__)
-        self.templates_dir_path = os.path.join(self.current_dir, "template")
         self.verbose = verbose
         self.keep_in_memory = keep_in_memory
 
+        self.data_path = os.path.join(__package__, "data")
         # Prepin
         self.prepin_dir_path = prepin_dir
         self.prepin_dir = prepin_dir
@@ -64,11 +64,13 @@ Please select one of `{template_id_types}`.
 
         if template_id_type in ["UNS"]:
             # Use the 'material' template folder
-            template_file_path = os.path.join(self.templates_dir_path, "material", template_filename)
+            template_file_path = os.path.join("template", "material", template_filename)
+            template_resource = files(data).joinpath(template_file_path)
         else:
             warnings.warn(f"Not yet supported")
 
-        if not os.path.isfile(template_file_path):
+        print(files(data))
+        if not template_resource.is_file():
             raise Exception(f"Template {template_filename} does not exist.")
 
         # Create Prepin Output Directory
@@ -150,7 +152,7 @@ Spot Radius: {spot_radius} m
                 )
 
                 # Update Template File
-                with open(template_file_path) as file:
+                with template_resource.open() as file:
                     t = file.read()
 
                 t = t.replace("<POWER>", str(s.power_cgs)) 
