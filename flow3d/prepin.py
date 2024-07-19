@@ -33,6 +33,18 @@ class Prepin():
         power,
         velocity,
         mesh_size = 2E-5,
+        mesh_x_start = 5E-4,
+        mesh_x_end = 3E-3,
+        mesh_y_start = 0,
+        mesh_y_end = 6E-4,
+        mesh_z_start = 0,
+        mesh_z_end = 6E-4,
+        fluid_region_x_start = 0,
+        fluid_region_x_end = 2.8E-3,
+        fluid_region_y_start = 0,
+        fluid_region_y_end = 6E-4, 
+        fluid_region_z_start = 0,
+        fluid_region_z_end = 4E-4, 
         lens_radius = 5E-5,
         spot_radius = 5E-5,
         template_id_type = "UNS",
@@ -46,6 +58,18 @@ class Prepin():
         @param power: Laser Power (W)
         @param velocity: Scan Velocity (m/s)
         @param mesh_size: Mesh Size (m) -> defaults to 2E-5 m (20 µm)
+        @param mesh_x_start: Mesh X Start (m) -> defaults to 5E-4 m (500 µm)
+        @param mesh_x_end: Mesh X End (m) -> defaults to 3E-3 m (3000 µm)
+        @param mesh_y_start: Mesh Y Start (m) -> defaults to 0 m (0 µm)
+        @param mesh_y_end: Mesh Y End (m) -> defaults to 6E-4 m (600 µm)
+        @param mesh_z_start: Mesh Z Start (m) -> defaults to 0 m (0 µm)
+        @param mesh_z_end: Mesh Z End (m) -> defaults to 6E-4 m (600 µm)
+        @param fluid_region_x_start: Fluid back boundary (default 0 µm)
+        @param fluid_region_x_end: Fluid front boundary (default 2800 µm)
+        @param fluid_region_y_start: Fluid left boundary (default 0 µm)
+        @param fluid_region_y_end: Fluid right boundary (default 600 µm)
+        @param fluid_region_z_start: Fluid bottom boundary (default 0 µm)
+        @param fluid_region_z_end: Fluid top boundary (default 400 µm)
         @param lens_radius: Lens Radius (cm) -> defaults to 5E-5 (50 µm)
         @param spot_radius: Spot Radius (cm) -> defaults to 5E-5 (50 µm)
         @param id_type: Identifier Type -> defaults to 'UNS'
@@ -147,6 +171,18 @@ Spot Radius: {spot_radius} m
                     power,
                     velocity,
                     mesh_size,
+                    mesh_x_start,
+                    mesh_x_end,
+                    mesh_y_start,
+                    mesh_y_end,
+                    mesh_z_start,
+                    mesh_z_end,
+                    fluid_region_x_start,
+                    fluid_region_x_end,
+                    fluid_region_y_start,
+                    fluid_region_y_end, 
+                    fluid_region_z_start,
+                    fluid_region_z_end, 
                     lens_radius,
                     spot_radius,
                 )
@@ -155,11 +191,23 @@ Spot Radius: {spot_radius} m
                 with template_resource.open() as file:
                     t = file.read()
 
-                t = t.replace("<POWER>", str(s.power_cgs)) 
-                t = t.replace("<VELOCITY>", str(s.velocity_cgs)) 
-                t = t.replace("<LENS_RADIUS>", str(s.lens_radius_cgs)) 
-                t = t.replace("<SPOT_RADIUS>", str(s.spot_radius_cgs)) 
-                t = t.replace("<MESH_SIZE>", str(s.mesh_size_cgs))
+                t = t.replace("<POWER>", str(s.cgs("power")))
+                t = t.replace("<VELOCITY>", str(s.cgs("velocity")))
+                t = t.replace("<LENS_RADIUS>", str(s.cgs("lens_radius")))
+                t = t.replace("<SPOT_RADIUS>", str(s.cgs("spot_radius")))
+                t = t.replace("<MESH_SIZE>", str(s.cgs("mesh_size")))
+                t = t.replace("<MESH_X_START>", str(s.cgs("mesh_x_start")))
+                t = t.replace("<MESH_X_END>", str(s.cgs("mesh_x_end")))
+                t = t.replace("<MESH_Y_START>", str(s.cgs("mesh_y_start")))
+                t = t.replace("<MESH_Y_END>", str(s.cgs("mesh_y_end")))
+                t = t.replace("<MESH_Z_START>", str(s.cgs("mesh_z_start")))
+                t = t.replace("<MESH_Z_END>", str(s.cgs("mesh_z_end")))
+                t = t.replace("<FLUID_REGION_X_START>", str(s.cgs("fluid_region_x_start")))
+                t = t.replace("<FLUID_REGION_X_END>", str(s.cgs("fluid_region_x_end")))
+                t = t.replace("<FLUID_REGION_Y_START>", str(s.cgs("fluid_region_y_start")))
+                t = t.replace("<FLUID_REGION_Y_END>", str(s.cgs("fluid_region_y_end")))
+                t = t.replace("<FLUID_REGION_Z_START>", str(s.cgs("fluid_region_z_start")))
+                t = t.replace("<FLUID_REGION_Z_END>", str(s.cgs("fluid_region_z_end")))
 
                 s.prepin = t
                 simulations.append(s)

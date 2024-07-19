@@ -23,14 +23,18 @@ def test_init(s):
     assert s.spot_radius == None
     assert s.beam_diameter == None
     assert s.mesh_size == None
-
-    # Process Parameters (centimeter-gram-second)
-    assert s.power_cgs == None
-    assert s.velocity_cgs == None
-    assert s.lens_radius_cgs == None
-    assert s.spot_radius_cgs == None
-    assert s.beam_diameter_cgs == None
-    assert s.mesh_size_cgs == None
+    assert s.mesh_x_start == None
+    assert s.mesh_x_end == None
+    assert s.mesh_y_start == None
+    assert s.mesh_y_end == None
+    assert s.mesh_z_start == None
+    assert s.mesh_z_end == None
+    assert s.fluid_region_x_start == None
+    assert s.fluid_region_x_end == None
+    assert s.fluid_region_y_start == None
+    assert s.fluid_region_y_end == None
+    assert s.fluid_region_z_start == None
+    assert s.fluid_region_z_end == None
 
     # Prepin
     assert s.prepin == None
@@ -40,19 +44,25 @@ def test_set_process_parameters(s):
     Tests the update of process parameters
     """
     
-    s.set_process_parameters(0, 0, 0, 0, 0)
+    s.set_process_parameters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     assert s.power == 0
     assert s.velocity == 0
     assert s.lens_radius == 0
     assert s.spot_radius == 0
     assert s.beam_diameter == 0
     assert s.mesh_size == 0
-    assert s.power_cgs == 0
-    assert s.velocity_cgs == 0
-    assert s.lens_radius_cgs == 0
-    assert s.spot_radius_cgs == 0
-    assert s.beam_diameter_cgs == 0
-    assert s.mesh_size_cgs == 0
+    assert s.mesh_x_start == 0 
+    assert s.mesh_x_end == 0
+    assert s.mesh_y_start == 0
+    assert s.mesh_y_end == 0
+    assert s.mesh_z_start == 0
+    assert s.mesh_z_end == 0
+    assert s.fluid_region_x_start == 0
+    assert s.fluid_region_x_end == 0
+    assert s.fluid_region_y_start == 0
+    assert s.fluid_region_y_end == 0
+    assert s.fluid_region_z_start == 0
+    assert s.fluid_region_z_end == 0
     assert s.name == "0_0000_00.0_0.0E+1_0.0E+1"
 
     s.set_process_parameters(100, 1)
@@ -62,13 +72,43 @@ def test_set_process_parameters(s):
     assert s.spot_radius == 5E-5
     assert s.beam_diameter == 1E-4
     assert s.mesh_size == 2E-5
-    assert s.power_cgs == 1E9
-    assert s.velocity_cgs == 100
-    assert s.lens_radius_cgs == 0.005 
-    assert s.spot_radius_cgs == 0.005 
-    assert s.beam_diameter_cgs == 0.01
-    assert s.mesh_size_cgs == 0.002
+    assert s.mesh_x_start == 5E-4
+    assert s.mesh_x_end == 3E-3
+    assert s.mesh_y_start == 0
+    assert s.mesh_y_end == 6E-4
+    assert s.mesh_z_start == 0 
+    assert s.mesh_z_end == 6E-4
+    assert s.fluid_region_x_start == 0
+    assert s.fluid_region_x_end == 2.8E-3
+    assert s.fluid_region_y_start == 0
+    assert s.fluid_region_y_end == 6E-4
+    assert s.fluid_region_z_start == 0
+    assert s.fluid_region_z_end == 4E-4
     assert s.name == "0_0100_01.0_1.0E-4_2.0E-5"
+
+def test_cgs(s):
+    """
+    Test centimeter-gram-second conversion of meter-gram-second values.
+    """
+    assert s.cgs("power") == 100 * 1E7
+    assert s.cgs("velocity") == 1 * 1E2
+
+    assert s.cgs("lens_radius") == 5E-3
+    assert s.cgs("spot_radius") == 5E-3
+    assert s.cgs("beam_diameter") == 1E-2
+    assert s.cgs("mesh_size") == 2E-3
+    assert s.cgs("mesh_x_start") == 5E-2
+    assert s.cgs("mesh_x_end") == 3E-1
+    assert s.cgs("mesh_y_start") == 0
+    assert s.cgs("mesh_y_end") == 6E-2
+    assert s.cgs("mesh_z_start") == 0 
+    assert s.cgs("mesh_z_end") == 6E-2
+    assert s.cgs("fluid_region_x_start") == 0
+    assert s.cgs("fluid_region_x_end") == 2.8E-1
+    assert s.cgs("fluid_region_y_start") == 0
+    assert s.cgs("fluid_region_y_end") == 6E-2
+    assert s.cgs("fluid_region_z_start") == 0
+    assert s.cgs("fluid_region_z_end") == 4E-2
 
 def test_generate_name_v0(s):
     """

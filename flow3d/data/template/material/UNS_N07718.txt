@@ -128,14 +128,14 @@
     MeshName='Mesh Block 1',
     size=<MESH_SIZE>, remark='Size of Cells',
 
-    px(1)=0.05, remark='Location of the Mesh Plane in the X Direction',
-    px(2)=0.3, remark='Location of the Mesh Plane in the X Direction',
+    px(1)=<MESH_X_START>, remark='Location of the Mesh Plane in the X Direction',
+    px(2)=<MESH_X_END>, remark='Location of the Mesh Plane in the X Direction',
 
-    py(1)=0, remark='Location of the Mesh Plane in the Y Direction',
-    py(2)=0.06, remark='Location of the Mesh Plane in the Y Direction',
+    py(1)=<MESH_Y_START>, remark='Location of the Mesh Plane in the Y Direction',
+    py(2)=<MESH_Y_END>, remark='Location of the Mesh Plane in the Y Direction',
 
-    pz(1)=0, remark='Location of the Mesh Plane in the Z Direction',
-    pz(2)=0.06, remark='Location of the Mesh Plane in the Z Direction',
+    pz(1)=<MESH_Z_START>, remark='Location of the Mesh Plane in the Z Direction',
+    pz(2)=<MESH_Z_END>, remark='Location of the Mesh Plane in the Z Direction',
 
  /
 
@@ -153,12 +153,12 @@
     remark='Material 1',
     fluidRegionName(1)='Region 1', remark='Fluid Region Name',
     ifdis(1)=0, remark='Geometry',
-    fxl(1)=0, remark='X Low',
-    fxh(1)=0.28, remark='X High',
-    fyl(1)=0, remark='Y Low',
-    fyh(1)=0.06, remark='Y High',
-    fzl(1)=0, remark='Z Low',
-    fzh(1)=0.04, remark='Z High',
+    fxl(1)=<FLUID_REGION_X_START>, remark='X Low',
+    fxh(1)=<FLUID_REGION_X_END>, remark='X High',
+    fyl(1)=<FLUID_REGION_Y_START>, remark='Y Low',
+    fyh(1)=<FLUID_REGION_Y_END>, remark='Y High',
+    fzl(1)=<FLUID_REGION_Z_START>, remark='Z Low',
+    fzh(1)=<FLUID_REGION_Z_END>, remark='Z High',
 
 
     remark= 'Void Pointer Common Parameters',
