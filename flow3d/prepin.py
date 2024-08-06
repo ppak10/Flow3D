@@ -1,3 +1,4 @@
+import math
 import os
 import warnings
 
@@ -47,6 +48,7 @@ class Prepin():
         fluid_region_z_end = 4E-4, 
         lens_radius = 5E-5,
         spot_radius = 5E-5,
+        gauss_beam = 5E-5 / math.sqrt(2),
         template_id_type = "UNS",
         keep_in_memory = False,
     ):
@@ -70,8 +72,9 @@ class Prepin():
         @param fluid_region_y_end: Fluid right boundary (default 600 µm)
         @param fluid_region_z_start: Fluid bottom boundary (default 0 µm)
         @param fluid_region_z_end: Fluid top boundary (default 400 µm)
-        @param lens_radius: Lens Radius (cm) -> defaults to 5E-5 (50 µm)
-        @param spot_radius: Spot Radius (cm) -> defaults to 5E-5 (50 µm)
+        @param lens_radius: Lens Radius (m) -> defaults to 5E-5 (50 µm)
+        @param spot_radius: Spot Radius (m) -> defaults to 5E-5 (50 µm)
+        @param gauss_beam: Gaussian Beam (m) -> defaults to 5E-5/√2 (50/√2 µm)
         @param id_type: Identifier Type -> defaults to 'UNS'
         @return
         """
@@ -185,6 +188,7 @@ Spot Radius: {spot_radius} m
                     fluid_region_z_end, 
                     lens_radius,
                     spot_radius,
+                    gauss_beam,
                 )
 
                 # Update Template File
@@ -195,6 +199,7 @@ Spot Radius: {spot_radius} m
                 t = t.replace("<VELOCITY>", str(s.cgs("velocity")))
                 t = t.replace("<LENS_RADIUS>", str(s.cgs("lens_radius")))
                 t = t.replace("<SPOT_RADIUS>", str(s.cgs("spot_radius")))
+                t = t.replace("<GAUSS_BEAM>", str(s.cgs("gauss_beam")))
                 t = t.replace("<MESH_SIZE>", str(s.cgs("mesh_size")))
                 t = t.replace("<MESH_X_START>", str(s.cgs("mesh_x_start")))
                 t = t.replace("<MESH_X_END>", str(s.cgs("mesh_x_end")))

@@ -249,7 +249,7 @@
     r0lbm(1)=<LENS_RADIUS>, remark='lens radius',
     rflbm(1)=<SPOT_RADIUS>, remark='spot radius',
     dlflbm(1)=40, remark='focal distance',
-    rblbm(1)=0.0035355339, remark='Gauss dist. (rb)',
+    rblbm(1)=<GAUSS_BEAM>, remark='Gauss dist. (rb)',
     rzlbm(1)=-1, remark='Z direction',
 
 

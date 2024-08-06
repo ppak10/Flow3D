@@ -1,3 +1,4 @@
+import math
 import pytest
 
 from flow3d import Simulation
@@ -22,6 +23,7 @@ def test_init(s):
     assert s.lens_radius == None
     assert s.spot_radius == None
     assert s.beam_diameter == None
+    assert s.gauss_beam == None
     assert s.mesh_size == None
     assert s.mesh_x_start == None
     assert s.mesh_x_end == None
@@ -44,12 +46,13 @@ def test_set_process_parameters(s):
     Tests the update of process parameters
     """
     
-    s.set_process_parameters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    s.set_process_parameters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
     assert s.power == 0
     assert s.velocity == 0
     assert s.lens_radius == 0
     assert s.spot_radius == 0
     assert s.beam_diameter == 0
+    assert s.gauss_beam == 0
     assert s.mesh_size == 0
     assert s.mesh_x_start == 0 
     assert s.mesh_x_end == 0
@@ -70,6 +73,7 @@ def test_set_process_parameters(s):
     assert s.velocity == 1
     assert s.lens_radius == 5E-5
     assert s.spot_radius == 5E-5
+    assert s.gauss_beam == 5E-5 / math.sqrt(2)
     assert s.beam_diameter == 1E-4
     assert s.mesh_size == 2E-5
     assert s.mesh_x_start == 5E-4
@@ -95,6 +99,7 @@ def test_cgs(s):
 
     assert s.cgs("lens_radius") == 5E-3
     assert s.cgs("spot_radius") == 5E-3
+    assert s.cgs("gauss_beam") == pytest.approx(5E-3 / math.sqrt(2))
     assert s.cgs("beam_diameter") == 1E-2
     assert s.cgs("mesh_size") == 2E-3
     assert s.cgs("mesh_x_start") == 5E-2

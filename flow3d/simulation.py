@@ -1,3 +1,5 @@
+import math
+
 from decimal import Decimal
 
 class Simulation():
@@ -15,6 +17,7 @@ class Simulation():
         self.lens_radius = None
         self.spot_radius = None
         self.beam_diameter = None
+        self.gauss_beam = None
 
         # Mesh
         self.mesh_size = None
@@ -74,6 +77,7 @@ class Simulation():
         fluid_region_z_end = 4E-4, 
         lens_radius = 5E-5,
         spot_radius = 5E-5,
+        gauss_beam = 5E-5 / math.sqrt(2),
     ):
         """
         Set process parameters for a given simulation
@@ -95,6 +99,7 @@ class Simulation():
         @param fluid_region_z_end: Fluid top boundary (default 400 µm)
         @param lens_radius: Lens Radius (m) -> defaults to 5E-5 (50 µm)
         @param spot_radius: Spot Radius (m) -> defaults to 5E-5 (50 µm)
+        @param gauss_beam: Gaussian Beam (m) -> defaults to 5E-5/√2 (50/√2 µm)
         @return
         """
 
@@ -103,6 +108,9 @@ class Simulation():
         self.velocity = float(velocity)
         self.lens_radius = float(lens_radius)
         self.spot_radius = float(spot_radius)
+
+        # TODO: Handle auto-generation of gauss_beam parameter
+        self.gauss_beam = float(gauss_beam)
         self.beam_diameter = spot_radius * 2
         self.mesh_size = float(mesh_size)
         self.mesh_x_start = float(mesh_x_start)
@@ -131,6 +139,9 @@ class Simulation():
             # is implement in the future.
             # 1 m/s = 100 cm/s
             return getattr(self, parameter) * 100
+        elif parameter == "gauss_beam":
+            # Gauss beam should utilize a more precise value.
+            return getattr(self, parameter) * 1E2
         else:
             # Converting to decimal handles case where 2.799 != 2.8
             parameter_decimal = Decimal(getattr(self, parameter) * 1E2)
