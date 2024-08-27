@@ -20,17 +20,14 @@ def setup_teardown():
 
 @pytest.fixture(scope="module")
 def p():
-    return Prepin(prepin_dir=test_prepin_dir)
+    return Prepin()
 
 def test_init(p):
     """
     Tests initialization of variables for Prepin class
     """
 
-    assert p.keep_in_memory == False
     assert p.verbose == True
-    assert p.prepin_dir == test_prepin_dir
-    assert p.prepin_dir_path == test_prepin_dir
 
 def test_build_from_template_invalid_template_id_and_template_id_type(p):
     """

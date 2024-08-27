@@ -1,44 +1,14 @@
 import math
 
 from decimal import Decimal
+from flow3d.parameters import default_parameters
+from flow3d.prepin import Prepin
 
-class Simulation():
+class Simulation(Prepin):
     """
     Simulation object for Flow3D
     """
 
-    def __init__(self, name = None, version = 0):
-        self.version = version
-        self.name = name
-
-        # Process Parameters (meter-gram-second)
-        self.power = None
-        self.velocity = None
-        self.lens_radius = None
-        self.spot_radius = None
-        self.beam_diameter = None
-        self.gauss_beam = None
-
-        # Mesh
-        self.mesh_size = None
-        self.mesh_x_start = None
-        self.mesh_x_end = None
-        self.mesh_y_start = None
-        self.mesh_y_end = None
-        self.mesh_z_start = None
-        self.mesh_z_end = None
-
-        # Fluid Region
-        self.fluid_region_x_start = None
-        self.fluid_region_x_end = None
-        self.fluid_region_y_start = None
-        self.fluid_region_y_end = None
-        self.fluid_region_z_start = None
-        self.fluid_region_z_end = None
-
-        # Prepin
-        self.prepin = None
-    
     @staticmethod
     def update_name(func):
         """
@@ -58,32 +28,40 @@ class Simulation():
         return wrapper
 
     @update_name
-    def set_process_parameters(
+    def __init__(
         self,
-        power,
-        velocity,
-        mesh_size = 2E-5,
-        mesh_x_start = 5E-4,
-        mesh_x_end = 3E-3,
-        mesh_y_start = 0,
-        mesh_y_end = 6E-4,
-        mesh_z_start = 0,
-        mesh_z_end = 6E-4,
-        fluid_region_x_start = 0,
-        fluid_region_x_end = 2.8E-3,
-        fluid_region_y_start = 0,
-        fluid_region_y_end = 6E-4, 
-        fluid_region_z_start = 0,
-        fluid_region_z_end = 4E-4, 
-        lens_radius = 5E-5,
-        spot_radius = 5E-5,
-        gauss_beam = 5E-5 / math.sqrt(2),
+        version = 0,
+        verbose = False,
+        build_from_template = True,
+        **kwargs
     ):
+        super(Simulation, self).__init__()
+        self.version = version
+        self.verbose = verbose
+
+        # Sets default parameters
+        for key, value in default_parameters.items():
+            setattr(self, key, value)
+
+            # Sets value to that provided in kwargs
+            if key in kwargs.keys():
+                setattr(self, key, kwargs[key])
+
+        # Prepin
+        self.prepin = None
+    
+
+    @update_name
+    def set_process_parameters(self, **kwargs):
         """
         Set process parameters for a given simulation
 
         @param power: Laser Power (W)
         @param velocity: Scan Velocity (m/s)
+        @param beam_diameter: Beam Diameter (m) -> defaults to 1E-4 (100 µm)
+        @param lens_radius: Lens Radius (m) -> defaults to 5E-5 (50 µm)
+        @param spot_radius: Spot Radius (m) -> defaults to 5E-5 (50 µm)
+        @param gauss_beam: Gaussian Beam (m) -> defaults to 5E-5/√2 (50/√2 µm)
         @param mesh_size: Mesh Size (m) -> defaults to 2E-5 (20 µm)
         @param mesh_x_start: Mesh X Start (m) -> defaults to 5E-4 m (500 µm)
         @param mesh_x_end: Mesh X End (m) -> defaults to 3E-3 m (3000 µm)
@@ -97,34 +75,20 @@ class Simulation():
         @param fluid_region_y_end: Fluid right boundary (default 600 µm)
         @param fluid_region_z_start: Fluid bottom boundary (default 0 µm)
         @param fluid_region_z_end: Fluid top boundary (default 400 µm)
-        @param lens_radius: Lens Radius (m) -> defaults to 5E-5 (50 µm)
-        @param spot_radius: Spot Radius (m) -> defaults to 5E-5 (50 µm)
-        @param gauss_beam: Gaussian Beam (m) -> defaults to 5E-5/√2 (50/√2 µm)
         @return
         """
 
         # TODO: Add min / max checks.
-        self.power = int(power)
-        self.velocity = float(velocity)
-        self.lens_radius = float(lens_radius)
-        self.spot_radius = float(spot_radius)
-
         # TODO: Handle auto-generation of gauss_beam parameter
-        self.gauss_beam = float(gauss_beam)
-        self.beam_diameter = spot_radius * 2
-        self.mesh_size = float(mesh_size)
-        self.mesh_x_start = float(mesh_x_start)
-        self.mesh_x_end = float(mesh_x_end)
-        self.mesh_y_start = float(mesh_y_start)
-        self.mesh_y_end = float(mesh_y_end)
-        self.mesh_z_start = float(mesh_z_start)
-        self.mesh_z_end = float(mesh_z_end)
-        self.fluid_region_x_start = fluid_region_x_start
-        self.fluid_region_x_end = fluid_region_x_end
-        self.fluid_region_y_start = fluid_region_y_start
-        self.fluid_region_y_end = fluid_region_y_end
-        self.fluid_region_z_start = fluid_region_z_start
-        self.fluid_region_z_end = fluid_region_z_end
+        for key, value in kwargs.items():
+            if key in default_parameters.keys():
+                # Integer values
+                if key in ["power"]:
+                    setattr(self, key, int(value))
+
+                # converts everything else to float.
+                else:
+                    setattr(self, key, float(value))
 
     def cgs(self, parameter: str):
         """

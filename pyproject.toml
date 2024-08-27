@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "Flow3D"
-version = "0.0.10"
+version = "0.0.11"
 authors = [
   { name="Peter Pak", email="ppak10@gmail.com" },
 ]

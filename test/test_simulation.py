@@ -1,7 +1,7 @@
 import math
 import pytest
 
-from flow3d import Simulation
+from flow3d import Simulation, default_parameters
 
 version = 0
 
@@ -13,30 +13,19 @@ def test_init(s):
     """
     Tests initialization of Simulation class
     """
+    name = s.generate_name_v0(
+        power = default_parameters["power"],
+        velocity = default_parameters["velocity"],
+        beam_diameter = default_parameters["beam_diameter"],
+        mesh_size = default_parameters["mesh_size"],
+    )
 
     assert s.version == version
-    assert s.name == None
+    assert s.name == name
 
-    # Process Parameters (meter-gram-second)
-    assert s.power == None
-    assert s.velocity == None
-    assert s.lens_radius == None
-    assert s.spot_radius == None
-    assert s.beam_diameter == None
-    assert s.gauss_beam == None
-    assert s.mesh_size == None
-    assert s.mesh_x_start == None
-    assert s.mesh_x_end == None
-    assert s.mesh_y_start == None
-    assert s.mesh_y_end == None
-    assert s.mesh_z_start == None
-    assert s.mesh_z_end == None
-    assert s.fluid_region_x_start == None
-    assert s.fluid_region_x_end == None
-    assert s.fluid_region_y_start == None
-    assert s.fluid_region_y_end == None
-    assert s.fluid_region_z_start == None
-    assert s.fluid_region_z_end == None
+    # Default Parameters (meter-gram-second)
+    for key, value in default_parameters.items():
+        assert getattr(s, key) == value
 
     # Prepin
     assert s.prepin == None
@@ -45,49 +34,40 @@ def test_set_process_parameters(s):
     """
     Tests the update of process parameters
     """
+
+    # Set all parameter values to zero and check name.
+    zero_parameters = dict()
+    for key in default_parameters.keys():
+        zero_parameters[key] = 0
     
-    s.set_process_parameters(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    assert s.power == 0
-    assert s.velocity == 0
-    assert s.lens_radius == 0
-    assert s.spot_radius == 0
-    assert s.beam_diameter == 0
-    assert s.gauss_beam == 0
-    assert s.mesh_size == 0
-    assert s.mesh_x_start == 0 
-    assert s.mesh_x_end == 0
-    assert s.mesh_y_start == 0
-    assert s.mesh_y_end == 0
-    assert s.mesh_z_start == 0
-    assert s.mesh_z_end == 0
-    assert s.fluid_region_x_start == 0
-    assert s.fluid_region_x_end == 0
-    assert s.fluid_region_y_start == 0
-    assert s.fluid_region_y_end == 0
-    assert s.fluid_region_z_start == 0
-    assert s.fluid_region_z_end == 0
+    s.set_process_parameters(**zero_parameters)
+
+    for key in default_parameters.keys():
+        assert getattr(s, key) == 0
+
     assert s.name == "0_0000_00.0_0.0E+1_0.0E+1"
 
-    s.set_process_parameters(100, 1)
+    # Update only the power and velocity parameters and check name.
+    s.set_process_parameters(power = 100, velocity = 1)
     assert s.power == 100
     assert s.velocity == 1
-    assert s.lens_radius == 5E-5
-    assert s.spot_radius == 5E-5
-    assert s.gauss_beam == 5E-5 / math.sqrt(2)
-    assert s.beam_diameter == 1E-4
-    assert s.mesh_size == 2E-5
-    assert s.mesh_x_start == 5E-4
-    assert s.mesh_x_end == 3E-3
-    assert s.mesh_y_start == 0
-    assert s.mesh_y_end == 6E-4
-    assert s.mesh_z_start == 0 
-    assert s.mesh_z_end == 6E-4
-    assert s.fluid_region_x_start == 0
-    assert s.fluid_region_x_end == 2.8E-3
-    assert s.fluid_region_y_start == 0
-    assert s.fluid_region_y_end == 6E-4
-    assert s.fluid_region_z_start == 0
-    assert s.fluid_region_z_end == 4E-4
+
+    for key in default_parameters.keys():
+        if key == "power":
+            assert s.power == 100
+        elif key == "velocity":
+            assert s.velocity == 1
+        else:
+            assert getattr(s, key) == 0
+
+    assert s.name == "0_0100_01.0_0.0E+1_0.0E+1"
+
+    # Set all parameters back to default and check name.
+    s.set_process_parameters(**default_parameters)
+
+    for key in default_parameters.keys():
+        assert getattr(s, key) == default_parameters[key]
+
     assert s.name == "0_0100_01.0_1.0E-4_2.0E-5"
 
 def test_cgs(s):

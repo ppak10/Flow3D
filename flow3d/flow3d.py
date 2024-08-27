@@ -2,9 +2,10 @@ import os
 import warnings
 
 from datetime import datetime
-from flow3d.prepin import Prepin
+from flow3d.job import Job
+from flow3d.simulation import Simulation
 
-class Flow3D(Prepin):
+class Flow3D():
     """
     Wrapper for creating and running Flow 3D simulations.
     """
@@ -38,23 +39,21 @@ class Flow3D(Prepin):
 
         @param job_name: New name of job 
         """
-        if job_name is None:
-            # Sets `job_name` to approximate timestamp.
-            job_name = datetime.now().strftime("%Y%m%d_%H%M%S")
+        job = Job(job_name)
+        job.create_dir()
 
-        self.job_name = job_name
-        self.job_dir_path = os.path.join(self.output_dir, self.job_name)
+        return job
 
-        # Creates job folder directory in output directory.
-        if not os.path.isdir(self.job_dir_path):
-            os.makedirs(self.job_dir_path)
-        else:
-            warnings.warn(f"""
-Folder for job `{self.job_name}` already exists.
-Following operations will overwrite existing files within folder.
-""")
+    def create_simulation(self, **kwargs):
+        """
+        Creates folder to store simulation metadata such as prepin files.
 
-        return job_name
+        @param simulation_name: New name of simulation
+        """
+        simulation = Simulation(**kwargs)
+        # simulation.create_dir()
+
+        return simulation
 
     # Aliases
-    prepin_build_from_template = Prepin.build_from_template
+    # prepin_build_from_template = Prepin.build_from_template
