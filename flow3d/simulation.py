@@ -27,15 +27,36 @@ class Simulation(Prepin):
 
         return wrapper
 
+    @staticmethod
+    def update_prepin_file_content(func):
+        """
+        Decorator for updating prepin file content when process parameters have
+        changed.
+
+        @param func: Method where process parameters have changed within class.
+        """
+        def wrapper(self, *args, **kwargs):
+            result = func(self, *args, **kwargs)
+
+            # Update self.prepin_file_content
+            if self.use_template:
+                self.build_from_template()
+
+            return result
+
+        return wrapper
+
     @update_name
+    @update_prepin_file_content
     def __init__(
         self,
         version = 0,
         verbose = False,
-        build_from_template = True,
+        use_template = True,
         **kwargs
     ):
         super(Simulation, self).__init__()
+        self.use_template = use_template
         self.version = version
         self.verbose = verbose
 
@@ -43,15 +64,12 @@ class Simulation(Prepin):
         for key, value in default_parameters.items():
             setattr(self, key, value)
 
-            # Sets value to that provided in kwargs
-            if key in kwargs.keys():
-                setattr(self, key, kwargs[key])
-
-        # Prepin
-        self.prepin = None
-    
+        # Sets override values to that provided in kwargs
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     @update_name
+    @update_prepin_file_content
     def set_process_parameters(self, **kwargs):
         """
         Set process parameters for a given simulation
@@ -90,27 +108,6 @@ class Simulation(Prepin):
                 else:
                     setattr(self, key, float(value))
 
-    def cgs(self, parameter: str):
-        """
-        Converts metric process parameter to centimeter-gram-second units.
-        """
-        if parameter == "power":
-            # 1 erg = 1 cm^2 * g * s^-2
-            # 1 J = 10^7 ergs -> 1 W = 10^7 ergs/s
-            return getattr(self, parameter) * 1E7
-        elif parameter == "velocity":
-            # Handled separately from `else` case just in case if mm/s input
-            # is implement in the future.
-            # 1 m/s = 100 cm/s
-            return getattr(self, parameter) * 100
-        elif parameter == "gauss_beam":
-            # Gauss beam should utilize a more precise value.
-            return getattr(self, parameter) * 1E2
-        else:
-            # Converting to decimal handles case where 2.799 != 2.8
-            parameter_decimal = Decimal(getattr(self, parameter) * 1E2)
-            return float(round(parameter_decimal, 3))
-
     def generate_name_v0(
         self,
         power = None,
@@ -139,4 +136,4 @@ class Simulation(Prepin):
             m_s = f"{Decimal(self.mesh_size):.1E}".zfill(5)
 
         return f"0_{p}_{v}_{b_d}_{m_s}"
-    
+   

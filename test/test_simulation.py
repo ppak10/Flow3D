@@ -20,15 +20,18 @@ def test_init(s):
         mesh_size = default_parameters["mesh_size"],
     )
 
-    assert s.version == version
     assert s.name == name
+    assert s.use_template == True
+    assert s.verbose == False
+    assert s.version == version
 
     # Default Parameters (meter-gram-second)
     for key, value in default_parameters.items():
         assert getattr(s, key) == value
 
+    # TODO: Add in check for prepin_file_content
     # Prepin
-    assert s.prepin == None
+    # assert s.prepin == None
 
 def test_set_process_parameters(s):
     """
@@ -70,30 +73,30 @@ def test_set_process_parameters(s):
 
     assert s.name == "0_0100_01.0_1.0E-4_2.0E-5"
 
-def test_cgs(s):
-    """
-    Test centimeter-gram-second conversion of meter-gram-second values.
-    """
-    assert s.cgs("power") == 100 * 1E7
-    assert s.cgs("velocity") == 1 * 1E2
-
-    assert s.cgs("lens_radius") == 5E-3
-    assert s.cgs("spot_radius") == 5E-3
-    assert s.cgs("gauss_beam") == pytest.approx(5E-3 / math.sqrt(2))
-    assert s.cgs("beam_diameter") == 1E-2
-    assert s.cgs("mesh_size") == 2E-3
-    assert s.cgs("mesh_x_start") == 5E-2
-    assert s.cgs("mesh_x_end") == 3E-1
-    assert s.cgs("mesh_y_start") == 0
-    assert s.cgs("mesh_y_end") == 6E-2
-    assert s.cgs("mesh_z_start") == 0 
-    assert s.cgs("mesh_z_end") == 6E-2
-    assert s.cgs("fluid_region_x_start") == 0
-    assert s.cgs("fluid_region_x_end") == 2.8E-1
-    assert s.cgs("fluid_region_y_start") == 0
-    assert s.cgs("fluid_region_y_end") == 6E-2
-    assert s.cgs("fluid_region_z_start") == 0
-    assert s.cgs("fluid_region_z_end") == 4E-2
+# def test_cgs(s):
+#     """
+#     Test centimeter-gram-second conversion of meter-gram-second values.
+#     """
+#     assert s.cgs("power") == 100 * 1E7
+#     assert s.cgs("velocity") == 1 * 1E2
+# 
+#     assert s.cgs("lens_radius") == 5E-3
+#     assert s.cgs("spot_radius") == 5E-3
+#     assert s.cgs("gauss_beam") == pytest.approx(5E-3 / math.sqrt(2))
+#     assert s.cgs("beam_diameter") == 1E-2
+#     assert s.cgs("mesh_size") == 2E-3
+#     assert s.cgs("mesh_x_start") == 5E-2
+#     assert s.cgs("mesh_x_end") == 3E-1
+#     assert s.cgs("mesh_y_start") == 0
+#     assert s.cgs("mesh_y_end") == 6E-2
+#     assert s.cgs("mesh_z_start") == 0 
+#     assert s.cgs("mesh_z_end") == 6E-2
+#     assert s.cgs("fluid_region_x_start") == 0
+#     assert s.cgs("fluid_region_x_end") == 2.8E-1
+#     assert s.cgs("fluid_region_y_start") == 0
+#     assert s.cgs("fluid_region_y_end") == 6E-2
+#     assert s.cgs("fluid_region_z_start") == 0
+#     assert s.cgs("fluid_region_z_end") == 4E-2
 
 def test_generate_name_v0(s):
     """

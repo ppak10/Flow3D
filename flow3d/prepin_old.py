@@ -141,7 +141,8 @@ Mesh Size: {mesh_size} m
 Lens Radius: {lens_radius} m
 Spot Radius: {spot_radius} m
 """)
-
+        
+        # TODO: Move to simulation checks.
         # Check Power Arugment
         if isinstance(power, list):
             for p in power:
