@@ -1,7 +1,5 @@
 import os
-import warnings
 
-from datetime import datetime
 from flow3d.job import Job
 from flow3d.simulation import Simulation
 
@@ -10,16 +8,9 @@ class Flow3D():
     Wrapper for creating and running Flow 3D simulations.
     """
 
-    def __init__(
-        self,
-        output_dir="out",
-        keep_in_memory = False,
-        num_proc = 1,
-        verbose = False
-    ):
+    def __init__(self, output_dir="out", num_proc = 1, verbose = False):
         super(Flow3D, self).__init__()
         self.current_dir = os.path.dirname(__file__)
-        self.keep_in_memory = keep_in_memory
         self.num_proc = num_proc
         self.verbose = verbose
 
@@ -33,13 +24,18 @@ class Flow3D():
         self.job_name = None 
         self.job_dir_path = None
 
-    def create_job(self, job_name = None):
+    def create_job(self, **kwargs):
         """
         Creates folder to store data related to Flow3D job.
 
         @param job_name: New name of job 
         """
-        job = Job(job_name)
+
+        # Sets output_dir to value in self if override not provided.
+        if "output_dir" not in kwargs:
+            kwargs["output_dir"] = self.output_dir
+            
+        job = Job(**kwargs)
         job.create_dir()
 
         return job

@@ -1,10 +1,9 @@
+import datetime
 import os
 import subprocess
 import time
 import warnings
 import zipfile
-
-from datetime import datetime
 
 class Job():
     """
@@ -83,12 +82,40 @@ Following operations will overwrite existing files within folder.
         """
 
         # Change working directory to simulation folder
+        previous_dir_path = os.getcwd()
         s_dir_path = os.path.join(self.dir_path, simulation.name)
         os.chdir(s_dir_path)
 
         # Run and time simulation
         start_time = time.time()
-        subprocess.run(["runhyd", "simulation"])
+
+        try:
+            with open("runhyd.txt", "w") as f:
+                process = subprocess.Popen(
+                    ["runhyd", "simulation"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True
+                )
+
+                for line in process.stdout:
+                    f.write(line)
+                    # if self.verbose:
+                    #     print(line, end="")
+
+                process.stdout.close()
+                process.wait()
+
+            # Zip Large Files
+            flsgrf_zip = zipfile.ZipFile("flsgrf.zip", "w", zipfile.ZIP_DEFLATED)
+            flsgrf_zip.write("flsgrf.simulation")
+            flsgrf_zip.close()
+
+            # Remove Large File
+            os.remove("flsgrf.simulation")
+        except Exception as e:
+            print(e)
+
         end_time = time.time()
 
         # Write duration to file.
@@ -97,16 +124,8 @@ Following operations will overwrite existing files within folder.
         with open(f"simulation_execution_time.txt", "a") as f:
             f.write(duration_str)
 
-        # Zip Large Files
-        flsgrf_file_path = os.path.join(s_dir_path, "flsgrf.simulation")
-        flsgrf_zip_file_path = os.path.join(s_dir_path, "flsgrf.zip")
-        flsgrf_zip = zipfile.ZipFile(flsgrf_zip_file_path, "w", zipfile.ZIP_DEFLATED)
-        flsgrf_zip.write(flsgrf_file_path)
-        flsgrf_zip.close()
-
-        # Remove Large File
-        os.remove(flsgrf_file_path)
+        # Return back to previous directory path
+        os.chdir(previous_dir_path)
     
     def post_process(self):
         print("postprocess")
-
