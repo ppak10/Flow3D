@@ -1,4 +1,5 @@
 import os
+import pickle
 
 from flow3d.job import Job
 from flow3d.simulation import Simulation
@@ -20,10 +21,25 @@ class Flow3D():
             # Creates output directory to store Flow3D simulation data.
             os.makedirs(self.output_dir)
 
-        # Job
-        self.job_name = None 
-        self.job_dir_path = None
+    @staticmethod
+    def save_job(func):
+        """
+        Decorator for saving job instance to pickle file.
+        """
 
+        def wrapper(self, *args, **kwargs):
+            job = func(self, *args, **kwargs)
+
+            job_dir_path = os.path.join(self.output_dir, job.name)
+            job_pkl_path = os.path.join(job_dir_path, "job.pkl")
+            with open(job_pkl_path, "wb") as file:
+                pickle.dump(job, file)
+            
+            return job 
+
+        return wrapper
+
+    @save_job
     def create_job(self, **kwargs):
         """
         Creates folder to store data related to Flow3D job.
@@ -39,6 +55,18 @@ class Flow3D():
         job.create_dir()
 
         return job
+    
+    def load_job(self, job_name):
+        """
+        Loads job instance file
+        """
+
+        job_dir_path = os.path.join(self.output_dir, job_name)
+        job_pkl_path = os.path.join(job_dir_path, "job.pkl")
+        with open(job_pkl_path, "rb") as file:
+            job = pickle.load(file)
+            
+        return job
 
     def create_simulation(self, **kwargs):
         """
@@ -50,6 +78,4 @@ class Flow3D():
         # simulation.create_dir()
 
         return simulation
-
-    # Aliases
-    # prepin_build_from_template = Prepin.build_from_template
+    

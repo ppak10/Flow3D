@@ -100,7 +100,10 @@ Please select one of `{template_id_types}`.
             t = file.read()
 
         # Replaces values in template file with cgs parameter values.
-        for key, value in default_parameters.items():
+        for key in default_parameters.keys():
+            if self.verbose:
+                print(f"Replacing <{key.upper()}> with {str(self.cgs(key))}")
+
             t = t.replace(f"<{key.upper()}>", str(self.cgs(key)))
         
         self.prepin_file_content = t

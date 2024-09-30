@@ -1,0 +1,30 @@
+ &contrl
+     iconv= 0,     plotting_units_system= 2,     simulation_units_system= 2,
+     plotting_temperature_units= 1,     simulation_temperature_units= 1,
+     xea(001)=-1.00000E-11, yea(001)=-1.00000E-11, zea(001)=-1.00000E-11,
+ /
+ &pltreq
+ omode=-1,
+     pvnam1='p',
+     xvnam(1)='tn',
+     xvnam(2)='scl4',
+     xvnam(3)='scl5',
+     xvnam(4)='scl6',
+     xvnam(5)='scl7',
+     xvnam(6)='scl8',
+     xvnam(7)='nfs',
+     xvnam(8)='u',
+     xvnam(9)='v',
+     xvnam(10)='w',
+     xvnam(11)='f'
+     jmin(1)=2,  jmax(1)=251,
+     jmin(2)=2,  jmax(2)=61,
+     jmin(3)=2,  jmax(3)=61,
+     icmp= 1,
+     tmin=0.000000E+0, tmax=1.000124E-3,
+     ix=1, iy=2, iz=3,
+     title='printing tn, scl4 and nfs'
+ /
+ &pltreq
+  pvnam1='))eof((',
+ /
