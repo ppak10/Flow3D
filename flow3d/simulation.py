@@ -158,6 +158,7 @@ class Simulation(Prepin):
         # Check execution times files to see if finished zipping flsgrf file.
         # execution_times_file_path = os.path.join(simulation_dir_path, "execution_times.txt")
         chunks_dir_path = os.path.join(simulation_dir_path, "chunks")
+        chunks_zip_path = os.path.join(simulation_dir_path, "chunks.zip")
 
         if os.path.exists(simulation_dir_path):
 
@@ -180,7 +181,7 @@ class Simulation(Prepin):
                 # Indicates that flslnk file has been created.
                 status["post_process_create_flslnk_completed"] = True
 
-            if os.path.isdir(chunks_dir_path) and len(os.listdir(chunks_dir_path)):
+            if (os.path.isdir(chunks_dir_path) and len(os.listdir(chunks_dir_path))) or os.path.exists(chunks_zip_path):
                 # Indicates that chunks from flslnk file has been created.
                 status["post_process_create_chunks_completed"] = True
         
