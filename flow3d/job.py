@@ -6,6 +6,7 @@ import copy
 import pandas as pd
 import pickle
 import subprocess
+import shutil
 import time
 import warnings
 import zipfile
@@ -210,29 +211,61 @@ Following operations will overwrite existing files within folder.
 
         return simulation
     
-    def post_process(self):
-        for simulation in tqdm(sorted(self.simulations)):
-            print(f"""\n
+    def run_multiprocessing_post_process(self, simulation, simulation_status):
+        # if simulation_status["completed"] \
+        #     and simulation_status["run_simulation_completed"]:
+        if simulation_status["run_simulation_completed"]:
+            if not simulation_status["post_process_create_flslnk_completed"]:
+                print(f"Creating `flslnk.tmp` file for {simulation.name}...")
+                self.post_process_create_flslnk(simulation)
+
+            if not simulation_status["post_process_create_chunks_completed"]:
+                print(f"Processing `flslnk.tmp` into chunks for {simulation.name}...")
+                self.post_process_create_chunks(simulation)
+            # self.post_process_format_chunks(simulation)
+        else:
+            print(f"{simulation.name} not completed, skipping")
+
+    def post_process(self, num_proc = 1):
+        if num_proc > 1:
+            with multiprocessing.Pool(processes=num_proc) as pool:
+                for simulation in tqdm(self.simulations):
+                    print(f"""\n
 ################################################################################
 Post Process: `{simulation.name}`
 ################################################################################
 """)
-            s_dir_path = os.path.join(self.dir_path, simulation.name)
-            simulation_status = simulation.check_status(s_dir_path)
+                    s_dir_path = os.path.join(self.dir_path, simulation.name)
+                    simulation_status = simulation.check_status(s_dir_path)
+                    pool.apply_async(self.run_multiprocessing_post_process, args=(simulation, simulation_status))
+                
+                pool.close()
+                pool.join()
+                print("finished")
 
-            # if simulation_status["completed"] \
-            #     and simulation_status["run_simulation_completed"]:
-            if simulation_status["run_simulation_completed"]:
-                if not simulation_status["post_process_create_flslnk_completed"]:
-                    print(f"Creating `flslnk.tmp` file for {simulation.name}...")
-                    self.post_process_create_flslnk(simulation)
+        else:
+            for simulation in tqdm(sorted(self.simulations)):
+                print(f"""\n
+################################################################################
+Post Process: `{simulation.name}`
+################################################################################
+""")
+                s_dir_path = os.path.join(self.dir_path, simulation.name)
+                simulation_status = simulation.check_status(s_dir_path)
 
-                if not simulation_status["post_process_create_chunks_completed"]:
-                    print(f"Processing `flslnk.tmp` into chunks for {simulation.name}...")
-                    self.post_process_create_chunks(simulation)
-                # self.post_process_format_chunks(simulation)
-            else:
-                print(f"{simulation.name} not completed, skipping")
+                # if simulation_status["completed"] \
+                #     and simulation_status["run_simulation_completed"]:
+                if simulation_status["run_simulation_completed"]:
+                    if not simulation_status["post_process_create_flslnk_completed"]:
+                        print(f"Creating `flslnk.tmp` file for {simulation.name}...")
+                        self.post_process_create_flslnk(simulation)
+
+                    if not simulation_status["post_process_create_chunks_completed"]:
+                        print(f"Processing `flslnk.tmp` into chunks for {simulation.name}...")
+                        self.post_process_create_chunks(simulation)
+                    # self.post_process_format_chunks(simulation)
+                else:
+                    print(f"{simulation.name} not completed, skipping")
 
     @run_simulation_subprocess
     def post_process_create_flslnk(
@@ -357,6 +390,14 @@ flsinp.simulation file content:
                 output_path = os.path.join(chunk_dir_path, output_file)
                 with open(output_path, 'w') as out_f:
                     out_f.writelines(chunk)
+
+        if zip_output:
+            print("Zipping `chunks` folder...")
+            shutil.make_archive(chunk_dir_path, "zip", chunk_dir_path)
+
+        if delete_output:
+            print("Deleting `chunks` folder")
+            shutil.rmtree(chunk_dir_path)
 
         return simulation
     
@@ -532,8 +573,18 @@ Create Dataset: `{dataset_id}` -> `{simulation.name}`
         self,
         simulation,
         dataset_id,
+        delete_output = True,
     ):
         chunk_dir_path = os.path.join(self.dir_path, simulation.name, "chunks")
+        chunk_zip_path = os.path.join(self.dir_path, simulation.name, "chunks.zip")
+
+        if not os.path.exists(chunk_dir_path):
+            if os.path.exists(chunk_zip_path):
+                os.makedirs(chunk_dir_path)
+                with zipfile.ZipFile(chunk_zip_path, "r") as zip_ref:
+                    zip_ref.extractall(chunk_dir_path)
+            else:
+                raise FileNotFoundError(f"`chunks.zip` file not found: {chunk_zip_path}")
 
         # Skips 0th chunk with metadata
         chunk_data_listdir = sorted(os.listdir(chunk_dir_path))[1:-1]
@@ -605,6 +656,10 @@ Create Dataset: `{dataset_id}` -> `{simulation.name}`
             commit_message = simulation.name,
             split = "simulation",
         )
+
+        if delete_output:
+            print("Deleting `chunks` folder")
+            shutil.rmtree(chunk_dir_path)
 
     # def huggingface_dataset_upload_raw(self):
 
