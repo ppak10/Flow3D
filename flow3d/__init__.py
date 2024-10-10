@@ -1,5 +1,3 @@
 from .flow3d import Flow3D
-from .parameters import default_parameters
-from .prepin import Prepin
+from .job import Job
 from .simulation import Simulation
-
