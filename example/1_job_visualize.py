@@ -7,4 +7,4 @@ f = Flow3D(output_dir=output_dir)
 
 job = f.load_job("Ti-6Al-4V_t_reddy_process_map_20_micron")
 
-job.run_post_process(num_proc=8)
+job.run_visualize(num_proc=48)

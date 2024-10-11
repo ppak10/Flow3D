@@ -7,6 +7,7 @@ import zipfile
 
 from tqdm import tqdm
 from .utils import JobUtils
+from .wandb import JobWandb
 
 class JobSimulation():
     """
@@ -68,19 +69,21 @@ class JobSimulation():
         # Saves list of simulations to job
         self.save()
         return simulation
-    
+
+    @JobWandb.wandb_run
     def run_simulations(self):
         """
         Run simulations loaded in job
         """
         for simulation in tqdm(self.simulations):
             self.run_simulation(simulation, working_dir = simulation.name)
+
+            # TODO: Implement better logging here.
             if self.use_wandb:
                 wandb.log({
                     "name": simulation.name,
                     "time": time.time()
                 })
-        wandb.finish()
 
     @save_simulation
     @JobUtils.change_working_directory

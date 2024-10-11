@@ -1,8 +1,12 @@
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, upload_folder
 
 version = 0
 
 class HuggingFace():
+    """
+    Huggingface hub related api endpoint methods.
+    """
+
     def __init__(self):
         self.api = HfApi()
     
@@ -45,3 +49,16 @@ class HuggingFace():
         )
 
         return repo_url
+
+    @staticmethod 
+    def upload_folder(repo_id, folder_path, path_in_repo, repo_type="dataset"):
+        """
+        https://huggingface.co/docs/huggingface_hub/en/package_reference/hf_api#huggingface_hub.HfApi.upload_folder
+        """
+        return upload_folder(
+            repo_id = repo_id,
+            folder_path = folder_path,
+            path_in_repo = path_in_repo,
+            repo_type = repo_type
+        )
+    

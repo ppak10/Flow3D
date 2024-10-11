@@ -164,3 +164,5 @@ cython_debug/
 cache
 renders
 out
+
+wandb/

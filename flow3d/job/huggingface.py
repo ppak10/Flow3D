@@ -2,10 +2,12 @@ import multiprocessing
 import numpy as np
 import os
 import shutil
+import time
 import zipfile
 
 from datasets import concatenate_datasets, Dataset
 from tqdm import tqdm
+
 
 from flow3d.huggingface import HuggingFace
 
@@ -33,16 +35,50 @@ class JobHuggingface():
         if num_proc > 1:
             with multiprocessing.Pool(processes=num_proc) as pool:
                 for simulation in tqdm(self.simulations):
-                    pool.apply_async(self.dataset_create, args=(simulation, dataset_id,))
+                    pool.apply_async(
+                        self.dataset_create,
+                        args=(simulation, dataset_id,),
+                        error_callback=self.error_callback
+                    )
                 
                 pool.close()
                 pool.join()
-                print("finished")
 
         else:
-
             for simulation in tqdm(self.simulations):
                 self.dataset_create(simulation, dataset_id)
+
+    def upload_huggingface_dataset_files(self, dataset_id, num_proc = 1, sleep_time_between_uploads = 30):
+        """
+        Uploads all local dataset files to huggingface.
+
+        @param dataset_id: Huggingface dataset identifier.
+        @param num_proc: Stick with 1 process to prevent rate limiting for now.
+        @param sleep_time_between_uploads: 30 seconds for rate limiting.
+        """
+
+        if num_proc > 1:
+            with multiprocessing.Pool(processes=num_proc) as pool:
+                for simulation in tqdm(self.simulations):
+                    folder_path = os.path.join(self.job_dir_path, simulation.name)
+                    path_in_repo = simulation.name
+                    upload_url = pool.apply_async(
+                        HuggingFace.upload_folder,
+                        args=(dataset_id, folder_path, path_in_repo),
+                        error_callback=self.error_callback
+                    )
+                    print(f"Uploaded `{simulation.name}` at {upload_url}")
+                
+                pool.close()
+                pool.join()
+
+        else:
+            for simulation in tqdm(self.simulations):
+                folder_path = os.path.join(self.job_dir_path, simulation.name)
+                path_in_repo = simulation.name
+                upload_url = HuggingFace.upload_folder(dataset_id, folder_path, path_in_repo)
+                print(f"Uploaded `{simulation.name}` at {upload_url}")
+                time.sleep(sleep_time_between_uploads)
 
     def dataset_create(
         self,
