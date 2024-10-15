@@ -7,7 +7,7 @@ f = Flow3D(output_dir=output_dir)
 
 # Create Job
 # job = f.create_job(name = "Ti-6Al-4V_fast_test", use_wandb = True)
-job = f.create_job(name = "SS316L_t_reddy_process_map_20_micron", use_wandb = True)
+job = f.create_job(name = "SS316L_t_reddy_process_map_10_micron", use_wandb = True)
 
 # Create simulation
 # s = f.create_simulation(
@@ -43,7 +43,7 @@ for power in powers:
             template_id = "S31603",  # Stainless Steel 316L Material Template
             # mesh_size = 1E-2        # 0.01 m (10,000 µm)
             # mesh_size = 5E-6        # 0.000005 m (5 µm)
-            # mesh_size = 1E-5        # 0.00001 m (10 µm)
+            mesh_size = 1E-5        # 0.00001 m (10 µm)
             # mesh_size = 2E-5        # 0.00002 m (20 µm)
         ))
 

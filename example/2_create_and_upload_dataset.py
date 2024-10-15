@@ -7,7 +7,7 @@ output_dir = "/home/flow3d-docker/out"
 # Initialize Flow3D wrapper library
 f = Flow3D(output_dir=output_dir)
 
-job_name = "Ti-6Al-4V_t_reddy_process_map_20_micron"
+job_name = "SS316L_t_reddy_process_map_20_micron"
 
 job = f.load_job(job_name)
 

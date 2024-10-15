@@ -74,10 +74,14 @@ class JobHuggingface():
 
         else:
             for simulation in tqdm(self.simulations):
+            # for simulation in tqdm(self.simulations[36:]):
                 folder_path = os.path.join(self.job_dir_path, simulation.name)
                 path_in_repo = simulation.name
-                upload_url = HuggingFace.upload_folder(dataset_id, folder_path, path_in_repo)
-                print(f"Uploaded `{simulation.name}` at {upload_url}")
+                try:
+                    upload_url = HuggingFace.upload_folder(dataset_id, folder_path, path_in_repo)
+                    print(f"Uploaded `{simulation.name}` at {upload_url}")
+                except Exception as e:
+                    print(e)
                 time.sleep(sleep_time_between_uploads)
 
     def dataset_create(
