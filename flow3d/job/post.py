@@ -54,9 +54,9 @@ Post Process: `{simulation.name}`
                 self.create_chunks(simulation, working_dir=simulation.name)
 
             simulation_status = simulation.check_status(s_dir_path)
-            if simulation_status["post_process_create_chunks_completed"]:
+            if not simulation_status["post_process_create_npz_completed"]:
                 print(f"Creating `.npz` files {simulation.name}...")
-                self.create_npz(simulation)
+                self.create_npz(simulation, zip_output=False)
         else:
             print(f"{simulation.name} not completed, skipping")
 
@@ -317,7 +317,7 @@ Post Process: `{simulation.name}`
         if delete_output:
             print("Deleting `chunks` and `npz` folder")
             shutil.rmtree(chunk_dir_path)
-            shutil.rmtree(npz_dir_path)
+            # shutil.rmtree(npz_dir_path)
         
         return simulation
 

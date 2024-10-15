@@ -36,7 +36,11 @@ class JobVisualize():
         """
 
         for simulation in tqdm(sorted(self.simulations)):
-            self.visualize(simulation, num_proc)
+            s_dir_path = os.path.join(self.job_dir_path, simulation.name)
+            simulation_status = simulation.check_status(s_dir_path)
+            if simulation_status["post_process_create_npz_completed"]:
+                print(f"Creating visualization files {simulation.name}...")
+                self.visualize(simulation, num_proc)
 
     def visualize(self, simulation, num_proc = 1):
         print(f"""\n
@@ -72,6 +76,34 @@ Visualize: `{simulation.name}`
                     zip_ref.extractall(npz_dir_path)
             else:
                 raise FileNotFoundError(f"`npz.zip` file not found: {npz_zip_path}")
+            
+        # Check if mesh_x_y_z.npz exists and create if not existant
+        if not os.path.exists(f"{self.job_dir_path}/{simulation.name}/mesh_x_y_z.npz"):
+            first_npz_filename = os.listdir(npz_dir_path)[0]
+            row_dict = np.load(f"{npz_dir_path}/{first_npz_filename}")
+            mesh_x_y_z_path = os.path.join(self.job_dir_path, simulation.name, "mesh_x_y_z.npz") 
+            mesh_x_y_z = row_dict["x_y_z"][0]
+            mesh_x_y_z_shape = np.array(mesh_x_y_z).shape
+
+            mesh_z_length = mesh_x_y_z_shape[0]
+            mesh_y_length = mesh_x_y_z_shape[1]
+            mesh_x_length = mesh_x_y_z_shape[2]
+
+            mesh_z = []
+            mesh_y = []
+            mesh_x = []
+
+            for mesh_z_index in range(mesh_z_length):
+                mesh_z.append(mesh_x_y_z[mesh_z_index][0][0][2])
+
+            for mesh_y_index in range(mesh_y_length):
+                mesh_y.append(mesh_x_y_z[0][mesh_y_index][0][1])
+
+            for mesh_x_index in range(mesh_x_length):
+                mesh_x.append(mesh_x_y_z[0][0][mesh_x_index][0])
+
+            np.savez(mesh_x_y_z_path, x=mesh_x, y=mesh_y, z=mesh_z)
+
 
         #TODO: Add checks
         if num_proc > 1:
