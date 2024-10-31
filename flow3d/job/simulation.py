@@ -125,12 +125,9 @@ class JobSimulation():
             process.stdout.close()
             process.wait()
 
-        # Zip Large Files
+        # Zip `flsgrf.simulation` File
         if zip_output:
-            print(f"Zipping `flsgrf.{simulation.filename}` file...")
-            flsgrf_zip = zipfile.ZipFile("flsgrf.zip", "w", zipfile.ZIP_DEFLATED)
-            flsgrf_zip.write(f"flsgrf.{simulation.filename}")
-            flsgrf_zip.close()
+            JobUtils.zip_file(f"flsgrf.{simulation.filename}", "flsgrf.zip")
 
         # Remove Large File
         if delete_output:

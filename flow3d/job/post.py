@@ -44,7 +44,10 @@ Post Process: `{simulation.name}`
         s_dir_path = os.path.join(self.job_dir_path, simulation.name)
         simulation_status = simulation.check_status(s_dir_path)
 
-        if simulation_status["run_simulation_completed"]:
+        if simulation_status["post_process_create_npz_completed"]:
+            print(f"{simulation.name} already post processed, skipping")
+
+        elif simulation_status["run_simulation_completed"]:
             if not simulation_status["post_process_create_flslnk_completed"]:
                 print(f"Creating `flslnk.tmp` file for {simulation.name}...")
                 self.create_flslnk(simulation, working_dir=simulation.name)
@@ -98,16 +101,7 @@ Post Process: `{simulation.name}`
                 f.write(flsinp)
 
         # Unzip flsgrf.zip file to flsgrf.simulation
-        print("Unzipping `flsgrf.zip` file...")
-        with zipfile.ZipFile("flsgrf.zip") as zip_ref:
-            file_name = zip_ref.namelist()[0] # should be `flsgrf.simulation`
-
-            # Open the file inside the zip archive
-            with zip_ref.open(file_name) as source_file:
-                # Open the destination file in write mode
-                with open("flsgrf.simulation", 'wb') as dest_file:
-                    # Write the contents of the source file to the destination file
-                    dest_file.write(source_file.read())
+        JobUtils.unzip_file("flsgrf.zip", "flsgrf.simulation")
 
         # Run subprocess for creating flslnk.tmp file. 
         print("Creating `flslnk.tmp` file...")
@@ -154,19 +148,9 @@ Post Process: `{simulation.name}`
         # i.e. 000000000001.txt
         chunk_zfill = 12
 
+        # Unzip flslnk.zip file to flslnk.tmp if not already done.
         if not os.path.exists("flslnk.tmp") and os.path.exists("flslnk.zip"):
-            # Unzip flsgrf.zip file to flsgrf.simulation
-            print("Unzipping `flslnk.zip` file...")
-            with zipfile.ZipFile("flslnk.zip") as zip_ref:
-                file_name = zip_ref.namelist()[0] # should be `flsgrf.simulation`
-
-                # Open the file inside the zip archive
-                with zip_ref.open(file_name) as source_file:
-                    # Open the destination file in write mode
-                    with open("flslnk.tmp", 'wb') as dest_file:
-                        # Write the contents of the source file to the destination file
-                        dest_file.write(source_file.read())
-
+            JobUtils.unzip_file("flslnk.zip", "flslnk.tmp")
 
         with open("flslnk.tmp", "r") as f:
             for line in tqdm(f):

@@ -62,6 +62,10 @@ class SimulationParameters():
         elif parameter == "gauss_beam":
             # Gauss beam should utilize a more precise value.
             return getattr(self, parameter) * 1E2
+        elif parameter == "mesh_size":
+            # Issues at 5 µm (0.0005) rounding to 10 µm (0.0010)
+            parameter_decimal = Decimal(getattr(self, parameter) * 1E2)
+            return float(round(parameter_decimal, 4))
         else:
             # Converting to decimal handles case where 2.799 != 2.8
             parameter_decimal = Decimal(getattr(self, parameter) * 1E2)

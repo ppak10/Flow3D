@@ -3,8 +3,10 @@ import logging
 import traceback
 import os
 import time
+import zipfile
 
 from datetime import timedelta
+from tqdm import tqdm
 
 class JobUtils():
 
@@ -121,5 +123,49 @@ class JobUtils():
         # Crop the array using the slices
         # cropped_array = array[z_slice, y_slice, x_slice]
         return cropped_array
-
     
+    @staticmethod
+    def unzip_file(source, destination, chunk_size = 1024**3):
+        """
+        Method for unzipping file utilizing a specified chunk size.
+        @param source: i.e. "flslnk.zip"
+        @param destination: i.e. "flslnk.tmp"
+        @param chunk_size: Defaults to 1 GB
+        """
+        print(f"Unzipping `{source}` file to `{destination}`...")
+        with zipfile.ZipFile(source) as zip_ref:
+            file_name = zip_ref.namelist()[0] # should be `flsgrf.simulation`
+
+            # Get the uncompressed file size for progress tracking
+            uncompressed_size = zip_ref.getinfo(file_name).file_size
+
+            # Open the file inside the zip archive
+            with zip_ref.open(file_name) as source_file:
+                # Open the destination file in write mode
+                with open(destination, 'wb') as dest_file:
+                    # Initialize tqdm progress bar
+                    with tqdm(total=uncompressed_size, unit="B", unit_scale=True, desc="Unzipping") as pbar:
+                        while True:
+
+                            # Read a chunk of data from the source file
+                            chunk = source_file.read(chunk_size)  # 1 GB chunk
+                            if not chunk:
+                                break  # Stop when no more data is read
+
+                            # Write the chunk to the destination file
+                            dest_file.write(chunk)
+
+                            # Update the progress bar
+                            pbar.update(len(chunk))
+
+    @staticmethod
+    def zip_file(source, destination, chunk_size=1024**3):
+        print(f"Zipping `{source}` file to `{destination}`...")
+        with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            with open(source, 'rb') as f_in:
+                while True:
+                    data = f_in.read(chunk_size)
+                    if not data:
+                        break
+                    # Convert `source` to string before passing to writestr
+                    zipf.writestr(str(source), data, compress_type=zipfile.ZIP_DEFLATED)
