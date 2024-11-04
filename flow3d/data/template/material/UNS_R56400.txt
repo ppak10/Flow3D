@@ -257,7 +257,7 @@
 
     utlbm(1,1)=<VELOCITY>, remark= 'U velocity',
 
-    avprslbm=151950, remark='evaporation pressure pscoefficient A',
+    avprslbm=0.15, remark='evaporation pressure pscoefficient A',
     bvprslbm=8.0144971996, remark='evaporation pressure pscoefficient B',
     irefopt=3, remark='multiple reflection option',
     ereflct=0.15, remark='coefficient epsilon of equation of fresnel reflection',

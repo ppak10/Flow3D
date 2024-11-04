@@ -123,49 +123,59 @@ class JobUtils():
         # Crop the array using the slices
         # cropped_array = array[z_slice, y_slice, x_slice]
         return cropped_array
-    
+
     @staticmethod
-    def unzip_file(source, destination, chunk_size = 1024**3):
+    def unzip_file(source, destination, chunk_size=1024**3):
         """
-        Method for unzipping file utilizing a specified chunk size.
-        @param source: i.e. "flslnk.zip"
-        @param destination: i.e. "flslnk.tmp"
-        @param chunk_size: Defaults to 1 GB
+        Method for unzipping multiple files with the same name into one combined file.
+        @param source: Path to the zip file, e.g., "flslnk.zip"
+        @param destination: Path to the output file, e.g., "flsgrf.simulation"
+        @param chunk_size: Size of each chunk to read (defaults to 10 MB)
         """
-        print(f"Unzipping `{source}` file to `{destination}`...")
+        print(f"Unzipping `{source}` to `{destination}`...")
+
         with zipfile.ZipFile(source) as zip_ref:
-            file_name = zip_ref.namelist()[0] # should be `flsgrf.simulation`
+            file_names = zip_ref.namelist()
 
-            # Get the uncompressed file size for progress tracking
-            uncompressed_size = zip_ref.getinfo(file_name).file_size
+            # Filter to include only files named "flsgrf.simulation"
+            # matching_files = [name for name in file_names if name == "flsgrf.simulation"]
 
-            # Open the file inside the zip archive
-            with zip_ref.open(file_name) as source_file:
-                # Open the destination file in write mode
-                with open(destination, 'wb') as dest_file:
-                    # Initialize tqdm progress bar
-                    with tqdm(total=uncompressed_size, unit="B", unit_scale=True, desc="Unzipping") as pbar:
+            # Open the destination file once and append each matching file's contents to it
+            with open(destination, 'wb') as dest_file:
+                for file_name in tqdm(file_names):
+                    # Get the uncompressed file size for progress tracking
+                    uncompressed_size = zip_ref.getinfo(file_name).file_size
+                    print(f"Extracting `{file_name}` ({uncompressed_size} bytes)")
+
+                    # Open each file inside the zip archive
+                    with zip_ref.open(file_name) as source_file:
+                        # Initialize tqdm progress bar
+                        # with tqdm(total=uncompressed_size, unit="B", unit_scale=True, desc=f"Extracting {file_name}", position=0, leave=True) as pbar:
                         while True:
-
                             # Read a chunk of data from the source file
-                            chunk = source_file.read(chunk_size)  # 1 GB chunk
+                            chunk = source_file.read(chunk_size)
                             if not chunk:
                                 break  # Stop when no more data is read
 
-                            # Write the chunk to the destination file
+                            # Append the chunk to the destination file
                             dest_file.write(chunk)
 
                             # Update the progress bar
-                            pbar.update(len(chunk))
+                            # pbar.update(len(chunk))
+
+        print(f"All matching files have been combined into `{destination}`.")
 
     @staticmethod
     def zip_file(source, destination, chunk_size=1024**3):
         print(f"Zipping `{source}` file to `{destination}`...")
-        with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            with open(source, 'rb') as f_in:
-                while True:
-                    data = f_in.read(chunk_size)
-                    if not data:
-                        break
-                    # Convert `source` to string before passing to writestr
-                    zipf.writestr(str(source), data, compress_type=zipfile.ZIP_DEFLATED)
+        zip = zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED)
+        zip.write(source)
+        zip.close()
+        # with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        #     with open(source, 'rb') as f_in:
+        #         while True:
+        #             data = f_in.read(chunk_size)
+        #             if not data:
+        #                 break
+        #             # Convert `source` to string before passing to writestr
+        #             zipf.writestr(str(source), data, compress_type=zipfile.ZIP_DEFLATED)

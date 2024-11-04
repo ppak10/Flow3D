@@ -100,8 +100,9 @@ Post Process: `{simulation.name}`
                 # Allows for post processing to actually work.
                 f.write(flsinp)
 
-        # Unzip flsgrf.zip file to flsgrf.simulation
-        JobUtils.unzip_file("flsgrf.zip", "flsgrf.simulation")
+        if not os.path.exists("flsgrf.simulation"):
+            # Unzip flsgrf.zip file to flsgrf.simulation
+            JobUtils.unzip_file("flsgrf.zip", "flsgrf.simulation")
 
         # Run subprocess for creating flslnk.tmp file. 
         print("Creating `flslnk.tmp` file...")
@@ -301,7 +302,7 @@ Post Process: `{simulation.name}`
         if delete_output:
             print("Deleting `chunks` and `npz` folder")
             shutil.rmtree(chunk_dir_path)
-            # shutil.rmtree(npz_dir_path)
+            shutil.rmtree(npz_dir_path)
         
         return simulation
 

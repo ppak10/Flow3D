@@ -29,7 +29,8 @@ class SimulationParameters():
 
             # Fluid Region
             "fluid_region_x_start": 0,          # 0 µm
-            "fluid_region_x_end": 2.8E-3,       # 2800 µm
+            # "fluid_region_x_end": 2.8E-3,       # 2800 µm
+            "fluid_region_x_end": 3E-3,         # 3000 µm
             "fluid_region_y_start": 0,          # 0 µm
             "fluid_region_y_end": 6E-4,         # 600 µm
             "fluid_region_z_start": 0,          # 0 µm

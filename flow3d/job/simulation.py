@@ -3,7 +3,6 @@ import pickle
 import subprocess
 import time
 import wandb
-import zipfile
 
 from tqdm import tqdm
 from .utils import JobUtils
@@ -105,7 +104,7 @@ class JobSimulation():
         """
 
         if os.path.isfile("runhyd.txt"):
-            print("`runhyd.txt` file exists, skipping...")
+            print(f"`runhyd.txt` file for {simulation.name} exists, skipping...")
             return simulation
 
         print(f"Running {simulation.name}...")

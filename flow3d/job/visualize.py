@@ -139,7 +139,13 @@ Visualize: `{simulation.name}`
 
                 imageio.mimsave(f"{visualize_dir_path}/images/{folder}.gif", frames, fps = 10)
 
-    def generate_cross_section(self, example, index, **kwargs):
+    def generate_cross_section(
+            self,
+            example,
+            index,
+            crop_multiplier = 2.0, # 5 micron mesh
+            **kwargs
+        ):
         # print(example)
         # index = kwargs["index"]
         working_dir = kwargs["working_dir"]
@@ -158,9 +164,16 @@ Visualize: `{simulation.name}`
         for key, configs in COLUMNS_CONFIG.items():
             cropped_array = JobUtils.crop_3d_array(
                 np.array(example[key][0]),
-                crop_x=(max(0, mesh_index - 50), min(mesh_index + 25, mesh_x_length)),
+                # crop_x=(max(0, mesh_index - int(50 * crop_multiplier)), min(mesh_index + int(25 * crop_multiplier), mesh_x_length)),
+                crop_x=(0, mesh_x_length),
                 crop_y=(mesh_y_length // 2, mesh_y_length // 2 + 1)
             )
+
+            # cropped_array = JobUtils.crop_3d_array(
+            #     np.array(example[key][0]),
+            #     crop_x=(max(0, mesh_index - 50), min(mesh_index + 25, mesh_x_length)),
+            #     crop_y=(mesh_y_length // 2, mesh_y_length // 2 + 1)
+            # )
             index_string = f"{index}".zfill(4)
             rotated_array = cropped_array.squeeze()[::-1, ::-1]
 
