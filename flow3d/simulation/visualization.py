@@ -9,7 +9,7 @@ from matplotlib.colors import Normalize
 from matplotlib.cm import get_cmap, ScalarMappable
 from tqdm import tqdm
 
-from .utils import JobUtils
+from .utils import SimulationUtils
 
 COLUMNS_CONFIG = {
     "pressure": {
@@ -35,50 +35,51 @@ COLUMNS_CONFIG = {
     },
 }
 
-class JobVisualize():
-    def __init__(
-            self,
-            views = ["isometric", "cross_section_x, cross_section_y"],
-            **kwargs
-        ):
-        self.views = views
+class SimulationVisualization():
+    # def __init__(
+    #         self,
+    #         views = ["isometric", "cross_section_x, cross_section_y"],
+    #         **kwargs
+    #     ):
+    #     self.views = views
 
-        super().__init__(**kwargs)
+    #     super().__init__(**kwargs)
 
-    def run_visualize(
-            self,
-            views = ["isometric", "cross_section_x", "cross_section_y"],
-            # views = ["cross_section_x"],
-            regenerate_mesh_x_y_z = False,
-            num_proc = 1,
-        ):
-        """
-        Runs post processing method with or without multiprocessing.
-        """
+    # def run_visualize(
+    #         self,
+    #         views = ["isometric", "cross_section_x", "cross_section_y"],
+    #         # views = ["cross_section_x"],
+    #         regenerate_mesh_x_y_z = False,
+    #         num_proc = 1,
+    #     ):
+    #     """
+    #     Runs post processing method with or without multiprocessing.
+    #     """
 
-        for simulation in tqdm(sorted(self.simulations)):
-            s_dir_path = os.path.join(self.job_dir_path, simulation.name)
-            simulation_status = simulation.check_status(s_dir_path)
-            if simulation_status["post_process_create_npz_completed"]:
-                print(f"Preparing visualization for {simulation.name}...")
-                self.prepare_visualize(
-                    regenerate_mesh_x_y_z = regenerate_mesh_x_y_z,
-                    working_dir = s_dir_path
-                )
+    #     for simulation in tqdm(sorted(self.simulations)):
+    #         s_dir_path = os.path.join(self.job_dir_path, simulation.name)
+    #         simulation_status = simulation.check_status(s_dir_path)
+    #         if simulation_status["post_process_create_npz_completed"]:
+    #             print(f"Preparing visualization for {simulation.name}...")
+    #             self.prepare_visualize(
+    #                 regenerate_mesh_x_y_z = regenerate_mesh_x_y_z,
+    #                 working_dir = s_dir_path
+    #             )
 
-                print(f"Creating visualization files {simulation.name}...")
-                for view in views:
-                    self.visualize(
-                        simulation,
-                        view,
-                        num_proc,
-                        working_dir = s_dir_path
-                    )
+    #             print(f"Creating visualization files {simulation.name}...")
+    #             for view in views:
+    #                 self.visualize(
+    #                     simulation,
+    #                     view,
+    #                     num_proc,
+    #                     working_dir = s_dir_path
+    #                 )
 
-    @JobUtils.change_working_directory 
-    def prepare_visualize(
+    @SimulationUtils.change_working_directory 
+    def prepare_visualization(
         self,
         views = ["isometric", "cross_section_x", "cross_section_y"],
+        npz_dir_path = "flslnk_npz",
         regenerate_mesh_x_y_z = False,
         **kwargs
     ):
@@ -109,18 +110,18 @@ class JobVisualize():
                         os.makedirs(f"{view_folder}/{subfolder}/{key}")
 
         # Unzip npz files
-        if not os.path.exists("npz"):
-            if os.path.exists("npz.zip"):
-                os.makedirs("npz")
-                with zipfile.ZipFile("npz.zip", "r") as zip_ref:
-                    zip_ref.extractall("npz")
+        if not os.path.exists(npz_dir_path):
+            if os.path.exists(f"{npz_dir_path}.zip"):
+                os.makedirs(npz_dir_path)
+                with zipfile.ZipFile(f"{npz_dir_path}.zip", "r") as zip_ref:
+                    zip_ref.extractall(npz_dir_path)
             else:
-                raise FileNotFoundError(f"`npz.zip` file not found")
+                raise FileNotFoundError(f"`{npz_dir_path}.zip` file not found")
 
         # Check if mesh_x_y_z.npz exists and create if not existant
         if not os.path.exists(f"mesh_x_y_z.npz") or regenerate_mesh_x_y_z:
-            first_npz_filename = os.listdir("npz")[0]
-            row_dict = np.load(f"npz/{first_npz_filename}")
+            first_npz_filename = os.listdir(npz_dir_path)[0]
+            row_dict = np.load(f"{npz_dir_path}/{first_npz_filename}")
             mesh_x_y_z = row_dict["x_y_z"][0]
             mesh_x_y_z_shape = np.array(mesh_x_y_z).shape
 
@@ -143,11 +144,17 @@ class JobVisualize():
 
             np.savez("mesh_x_y_z.npz", x=mesh_x, y=mesh_y, z=mesh_z)
 
-    @JobUtils.change_working_directory 
-    def visualize(self, simulation, view, num_proc = 1, **kwargs):
+    @SimulationUtils.change_working_directory 
+    def generate_visualization_view(
+        self,
+        view,
+        npz_dir_path = "flslnk_npz",
+        num_proc = 1,
+        **kwargs
+    ):
         print(f"""\n
 ################################################################################
-Visualize (`{view}`): `{simulation.name}`
+Visualize (`{view}`): `{self.name}`
 ################################################################################
 """)
         # View method for visualization.
@@ -158,8 +165,8 @@ Visualize (`{view}`): `{simulation.name}`
             with multiprocessing.Pool(processes=num_proc) as pool:
 
 
-                for index, npz_file in tqdm(enumerate(sorted(os.listdir("npz")))):
-                    npz_data = np.load(f"npz/{npz_file}")
+                for index, npz_file in tqdm(enumerate(sorted(os.listdir(npz_dir_path)))):
+                    npz_data = np.load(f"{npz_dir_path}/{npz_file}")
                     example = {key: npz_data[key] for key in npz_data.keys()}
                     pool.apply_async(
                         view_method,
@@ -170,14 +177,15 @@ Visualize (`{view}`): `{simulation.name}`
                 pool.join()
                 
         else:
-            for index, npz_file in tqdm(enumerate(sorted(os.listdir("npz")))):
-                npz_data = np.load(f"npz/{npz_file}")
+            for index, npz_file in tqdm(enumerate(sorted(os.listdir(npz_dir_path)))):
+                npz_data = np.load(f"{npz_dir_path}/{npz_file}")
                 example = {key: npz_data[key] for key in npz_data.keys()}
-                view_method(example, index, working_dir=simulation.name)
+                view_method(example, index, working_dir=self.name)
 
         print("Compiling images to `.gif`...")
 
-        visualize_dir_path = os.path.join(self.job_dir_path, simulation.name, "visualize")
+        # visualize_dir_path = os.path.join(self.job_dir_path, self.name, "visualize")
+        visualize_dir_path = "visualize"
         view_folder = f"{visualize_dir_path}/{view}"
 
         # Iterates through column folders within images
@@ -212,7 +220,7 @@ Visualize (`{view}`): `{simulation.name}`
             values = np.array(example[key][0])
             # print(f"values.shape: {values.shape}")
 
-            cropped_array = JobUtils.crop_3d_array(values,
+            cropped_array = SimulationUtils.crop_3d_array(values,
                 crop_y=(midpoint, midpoint + 1)
             )
             # print(f"cropped_array.shape: {cropped_array.shape}")
@@ -252,7 +260,7 @@ Visualize (`{view}`): `{simulation.name}`
         for key, configs in COLUMNS_CONFIG.items():
             values = np.array(example[key][0])
             # print(f"values.shape: {values.shape}")
-            cropped_array = JobUtils.crop_3d_array(
+            cropped_array = SimulationUtils.crop_3d_array(
                 np.array(example[key][0]),
                 crop_x=(midpoint, midpoint + 1)
             )

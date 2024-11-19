@@ -4,7 +4,7 @@
     remark='Inconel 718 (IN718)'
     remark='!! Remarks beginning with "!! " are automatically added and removed by FLOW-3D.',
     remark='!! Do not begin any user added remarks with with "!! ". They will be removed',
-    twfin=0.001, remark='Simulation Finish Time',
+    twfin=<SIMULATION_FINISH_TIME>, remark='Simulation Finish Time',
     itb=1,
     itwfin=2000000000,
     ifenrg=2,
@@ -242,9 +242,9 @@
 
     remark= 'Laser 1',
 
-    xb0lbm(1)=.06, remark='X position',
-    yb0lbm(1)=0.03, remark='Y position',
-    zb0lbm(1)=1.0, remark='Z position',
+    xb0lbm(1)=<BEAM_X>, remark='X position',
+    yb0lbm(1)=<BEAM_Y>, remark='Y position',
+    zb0lbm(1)=<BEAM_Z>, remark='Z position',
 
     r0lbm(1)=<LENS_RADIUS>, remark='lens radius',
     rflbm(1)=<SPOT_RADIUS>, remark='spot radius',
@@ -257,6 +257,7 @@
 
     utlbm(1,1)=<VELOCITY>, remark= 'U velocity',
 
+    ivprslbm=<EVAPORATION>, remark='evaporation calculation option',
     avprslbm=151950, remark='evaporation pressure pscoefficient A',
     bvprslbm=8.0144971996, remark='evaporation pressure pscoefficient B',
     irefopt=3, remark='multiple reflection option',

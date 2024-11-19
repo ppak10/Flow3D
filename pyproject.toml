@@ -16,6 +16,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+dynamic = ["scripts"]
 
 [project.urls]
 Homepage = "https://github.com/ppak10/Flow3D"

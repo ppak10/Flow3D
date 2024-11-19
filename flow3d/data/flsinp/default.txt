@@ -18,8 +18,8 @@
      xvnam(10)='w',
      xvnam(11)='f'
      jmin(1)=2,  jmax(1)=251,
-     jmin(2)=2,  jmax(2)=61,
-     jmin(3)=2,  jmax(3)=61,
+     jmin(2)=2,  jmax(2)=251,
+     jmin(3)=2,  jmax(3)=251,
      icmp= 1,
      tmin=0.000000E+0, tmax=1.000124E-3,
      ix=1, iy=2, iz=3,

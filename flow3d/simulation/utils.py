@@ -1,51 +1,15 @@
 import bisect
+import copy
+import functools
 import logging
 import traceback
+import numpy as np
 import os
-import time
 import zipfile
 
-from datetime import timedelta
 from tqdm import tqdm
 
-class JobUtils():
-
-    @staticmethod
-    def run_subprocess(func):
-        """
-        Decorator for running simulation subprocess.
-        """
-
-        def wrapper(self, *args, **kwargs):
-
-            # Use passed argument for custom output path
-            output_path = "execution_times.txt"
-            if "output_path" in kwargs:
-                output_path = kwargs["output_path"]
-
-            # Run and time simulation
-            start_time = time.time()
-
-            # Run subprocess
-            try:
-                output = func(self, *args, **kwargs)
-            except Exception as e:
-                print(e)
-                return None
-
-            # Write end time
-            end_time = time.time()
-
-            # Write duration to file.
-            duration = end_time - start_time
-            duration_str = str(timedelta(seconds=duration))
-            with open(output_path, "a") as f:
-                f.write(f"{func.__name__}: {duration_str}")
-
-            return output 
-
-        return wrapper
-
+class SimulationUtils():
     
     @staticmethod
     def change_working_directory(func):
@@ -53,6 +17,9 @@ class JobUtils():
         Decorator for changing and reverting working directory just for method.
         """
 
+        # Uses `functools.wraps` decorator to preserve metadadta during
+        # multiprocessing.
+        @functools.wraps(func)
         def wrapper(self, *args, **kwargs):
 
             # Set working directory from kwargs
@@ -62,15 +29,14 @@ class JobUtils():
                 working_dir = kwargs["working_dir"]
 
             # Change working directory
-            previous_dir_path = os.getcwd()
-            working_dir_path = os.path.join(self.job_dir_path, working_dir)
-            os.chdir(working_dir_path)
+            previous_dir = os.getcwd()
+            os.chdir(working_dir)
 
             # Run method 
             output = func(self, *args, **kwargs)
 
             # Change working directory back to previous folder
-            os.chdir(previous_dir_path)
+            os.chdir(previous_dir)
 
             return output
 
@@ -118,23 +84,6 @@ class JobUtils():
         cropped_array = array[z_slice, y_slice, x_slice]
         return cropped_array
 
-    # def crop_3d_array(array, crop_x, crop_y = None):
-    #     # Assuming the crop values specify how much to cut from the edges
-    #     # z_len, y_len, x_len = array.shape
-
-    #     # Create slices for x, y, and z based on the crop distances
-    #     x_slice = slice(crop_x[0], crop_x[1])
-    #     if crop_y is None:
-    #         cropped_array = array[:, :, x_slice]
-    #     else:
-    #         y_slice = slice(crop_y[0], crop_y[1])
-    #         cropped_array = array[:, y_slice, x_slice]
-    #     # z_slice = slice(crop_z[0], z_len - crop_z[1])
-
-    #     # Crop the array using the slices
-    #     # cropped_array = array[z_slice, y_slice, x_slice]
-    #     return cropped_array
-
     @staticmethod
     def unzip_file(source, destination, chunk_size=1024**3):
         """
@@ -177,16 +126,115 @@ class JobUtils():
         print(f"All matching files have been combined into `{destination}`.")
 
     @staticmethod
-    def zip_file(source, destination, chunk_size=1024**3):
+    def zip_file(source, destination):
         print(f"Zipping `{source}` file to `{destination}`...")
         zip = zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED)
         zip.write(source)
         zip.close()
-        # with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        #     with open(source, 'rb') as f_in:
-        #         while True:
-        #             data = f_in.read(chunk_size)
-        #             if not data:
-        #                 break
-        #             # Convert `source` to string before passing to writestr
-        #             zipf.writestr(str(source), data, compress_type=zipfile.ZIP_DEFLATED)
+
+    # TODO: Clean this up
+    @staticmethod
+    def df_to_numpy(df):
+        dtdx_dtdy_dtdz_timestep = []
+        dtdx_dtdy_dtdz_z = []
+        dtdx_dtdy_dtdz_y = []
+
+        x_y_z_timestep = []
+        x_y_z_z = []
+        x_y_z_y = []
+
+        vx_vy_vz_timestep = []
+        vx_vy_vz_z = []
+        vx_vy_vz_y = []
+
+        keys = ["pressure", "temperature", "melt_region", "temperature_gradient", "liquid_label", "fraction_of_fluid"]
+
+        values = {
+            "timestep": [],
+            "z": [],
+            "y": [],
+        }
+
+        key_values = {}
+        for key in keys:
+            key_values[key] = copy.deepcopy(values)
+
+        prev_z = None
+        prev_y = None
+
+        for i in range(len(df)):
+            row = df.iloc[i]
+
+            z, y = row["z"], row["y"]
+
+            if y != prev_y and prev_y is not None:
+
+                dtdx_dtdy_dtdz_z.append(dtdx_dtdy_dtdz_y)
+                dtdx_dtdy_dtdz_y = []
+
+                x_y_z_z.append(x_y_z_y)
+                x_y_z_y = []
+
+                vx_vy_vz_z.append(vx_vy_vz_y)
+                vx_vy_vz_y = []
+
+                for key in keys:
+                    # print(key, key_values[key]["y"])
+                    key_values[key]["z"].append(key_values[key]["y"])
+                    key_values[key]["y"] = []
+
+            if z != prev_z and prev_z is not None:
+
+                dtdx_dtdy_dtdz_timestep.append(dtdx_dtdy_dtdz_z)
+                dtdx_dtdy_dtdz_z = []
+
+                x_y_z_timestep.append(x_y_z_z)
+                x_y_z_z = []
+
+                vx_vy_vz_timestep.append(vx_vy_vz_z)
+                vx_vy_vz_z = []
+
+                for key in keys:
+                    # print(key, len(key_values[key]["z"]))
+                    key_values[key]["timestep"].append(key_values[key]["z"])
+                    key_values[key]["z"] = []
+
+            dtdx_dtdy_dtdz_y.append([row["dtdx"], row["dtdy"], row["dtdz"]])
+            x_y_z_y.append([row["x"], row["y"], row["z"]])
+            vx_vy_vz_y.append([row["vx"], row["vy"], row["vz"]])
+
+            for key in keys:
+                key_values[key]["y"].append(row[key])
+
+            prev_z = z
+            prev_y = y
+
+        # Adds last value
+        dtdx_dtdy_dtdz_y.append([row["dtdx"], row["dtdy"], row["dtdz"]])
+        x_y_z_y.append([row["x"], row["y"], row["z"]])
+        vx_vy_vz_y.append([row["vx"], row["vy"], row["vz"]])
+        dtdx_dtdy_dtdz_z.append(dtdx_dtdy_dtdz_y)
+
+        x_y_z_z.append(x_y_z_y)
+        vx_vy_vz_z.append(vx_vy_vz_y)
+
+        for key in keys:
+            key_values[key]["y"].append(row[key])
+            key_values[key]["z"].append(key_values[key]["y"])
+
+
+        timestep = {} 
+        for key in keys:
+            timestep[key] = [np.array(key_values[key]["timestep"])]
+
+        other = {
+            "dtdx_dtdy_dtdz": [np.array(dtdx_dtdy_dtdz_timestep)],
+            "x_y_z": [np.array(x_y_z_timestep)],
+            "vx_vy_vz": [np.array(vx_vy_vz_timestep)],
+        }
+
+        return {
+            **timestep,
+            **other,
+        }
+

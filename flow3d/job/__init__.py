@@ -1,7 +1,5 @@
 from .base import JobBase
 from .huggingface import JobHuggingface
-from .post import JobPost
-from .simulation import JobSimulation
 from .utils import JobUtils
 from .visualize import JobVisualize
 from .wandb import JobWandb
@@ -9,8 +7,6 @@ from .wandb import JobWandb
 class Job(
     JobBase,
     JobHuggingface,
-    JobPost,
-    JobSimulation,
     JobUtils,
     JobVisualize,
     JobWandb,
