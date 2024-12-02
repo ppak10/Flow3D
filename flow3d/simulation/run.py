@@ -1,14 +1,14 @@
 import os
 import subprocess
 
-from .utils import SimulationUtils
+from flow3d.simulation.utils.decorators import SimulationUtilsDecorators
 
 class SimulationRun():
     """
     Run methods file for simulation class.
     """
 
-    @SimulationUtils.change_working_directory
+    @SimulationUtilsDecorators.change_working_directory
     def runhyd(self, delete_output = True, zip_output = True, **kwargs):
         """
         Open `runhyd` subprocess and zip output
@@ -46,7 +46,7 @@ class SimulationRun():
 
         # Zip `flsgrf.simulation` File
         if zip_output:
-            SimulationUtils.zip_file(f"flsgrf.{self.filename}", "flsgrf.zip")
+            self.zip_file(f"flsgrf.{self.filename}", "flsgrf.zip")
 
         # Remove Large File
         if delete_output:

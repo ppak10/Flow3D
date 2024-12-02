@@ -1,23 +1,23 @@
+import copy
 import numpy as np
 import os
 import pandas as pd
 import shutil
 import subprocess
 import textwrap
-import zipfile
 
 from flow3d import data
 from importlib.resources import files
 from tqdm import tqdm
 
-from .utils import SimulationUtils
+from flow3d.simulation.utils.decorators import SimulationUtilsDecorators
 
 class SimulationPostProcessing():
     """
     Run methods file for simulation class.
     """
 
-    @SimulationUtils.change_working_directory
+    @SimulationUtilsDecorators.change_working_directory
     def guipost(
         self,
         delete_output = True,
@@ -36,7 +36,7 @@ class SimulationPostProcessing():
         """
 
         # Create `flsinp.simulation` file for simulation.
-        resource_file_path = os.path.join("flsinp", "default.txt")
+        resource_file_path = os.path.join("simulation", "flsinp", "default.txt")
         resource = files(data).joinpath(resource_file_path)
 
         with resource.open() as f:
@@ -56,7 +56,7 @@ class SimulationPostProcessing():
 
         # Unzip flsgrf.zip file to flsgrf.simulation
         if not os.path.exists("flsgrf.simulation"):
-            SimulationUtils.unzip_file("flsgrf.zip", "flsgrf.simulation")
+            self.unzip_file("flsgrf.zip", "flsgrf.simulation")
 
         # Run subprocess for creating flslnk.tmp file. 
         print("Creating `flslnk.tmp` file...")
@@ -71,7 +71,7 @@ class SimulationPostProcessing():
 
         # Zip output files
         if zip_output:
-            SimulationUtils.zip_file("flslnk.tmp", "flslnk.zip")
+            self.zip_file("flslnk.tmp", "flslnk.zip")
 
         # Remove output file
         if delete_output:
@@ -86,7 +86,7 @@ class SimulationPostProcessing():
         return self
 
     # TODO: Does not necessary need to change working directory.
-    @SimulationUtils.change_working_directory
+    @SimulationUtilsDecorators.change_working_directory
     def chunk_flslnk(
         self,
         chunk_dir_path = "flslnk_chunks",
@@ -108,7 +108,7 @@ class SimulationPostProcessing():
 
         # Unzip flslnk.zip file to flslnk.tmp if not already done.
         if not os.path.exists("flslnk.tmp") and os.path.exists("flslnk.zip"):
-            SimulationUtils.unzip_file("flslnk.zip", "flslnk.tmp")
+            self.unzip_file("flslnk.zip", "flslnk.tmp")
 
         with open("flslnk.tmp", "r") as f:
             for line in tqdm(f):
@@ -150,7 +150,7 @@ class SimulationPostProcessing():
     # TODO: Does not necessary need to change working directory.
     # TODO: Make method that does this multiprocessing per chunk rather than by
     # simulation
-    @SimulationUtils.change_working_directory
+    @SimulationUtilsDecorators.change_working_directory
     def flslnk_chunk_to_npz(
         self,
         chunk_dir_path = "flslnk_chunks",
@@ -160,19 +160,8 @@ class SimulationPostProcessing():
         zip_output = True,
         **kwargs,
     ):
-        # chunk_dir_path = os.path.join(self.job_dir_path, simulation.name, "chunks")
-        # chunk_zip_path = os.path.join(self.job_dir_path, simulation.name, "chunks.zip")
-
-        chunk_zip_path = f"{chunk_dir_path}.zip"
-
-        # Unzip chunks if already zipped
-        if not os.path.exists(chunk_dir_path):
-            if os.path.exists(chunk_zip_path):
-                os.makedirs(chunk_dir_path)
-                with zipfile.ZipFile(chunk_zip_path, "r") as zip_ref:
-                    zip_ref.extractall(chunk_dir_path)
-            else:
-                raise FileNotFoundError(f"`{chunk_zip_path}` file not found")
+        # Unzip chunks
+        self.unzip_folder(f"{chunk_dir_path}.zip", chunk_dir_path)
 
         # Create folder for npz files
         # npz_dir_path = os.path.join(self.job_dir_path, simulation.name, "npz") 
@@ -223,7 +212,7 @@ class SimulationPostProcessing():
             }
             data_renamed_df = data_df.rename(columns=keys)
 
-            numpy_arrays_dict = SimulationUtils.df_to_numpy(data_renamed_df)
+            numpy_arrays_dict = self.df_to_numpy(data_renamed_df)
             # print(numpy_arrays_dict)
 
             row_dict = {
@@ -239,41 +228,122 @@ class SimulationPostProcessing():
             npz_file_path = os.path.join(npz_dir_path, chunk_file_name)
             np.savez_compressed(npz_file_path, **row_dict)
 
-        # Generate mesh_x_y_z while here as well
-        # TODO: Make this into it's own method
-        # mesh_x_y_z_path = os.path.join(self.job_dir_path, self.name, "mesh_x_y_z.npz") 
-        # mesh_x_y_z = row_dict["x_y_z"][0]
-        # mesh_x_y_z_shape = np.array(mesh_x_y_z).shape
-
-        # mesh_z_length = mesh_x_y_z_shape[0]
-        # mesh_y_length = mesh_x_y_z_shape[1]
-        # mesh_x_length = mesh_x_y_z_shape[2]
-
-        # mesh_z = []
-        # mesh_y = []
-        # mesh_x = []
-
-        # for mesh_z_index in range(mesh_z_length):
-        #     mesh_z.append(mesh_x_y_z[mesh_z_index][0][0][2])
-
-        # for mesh_y_index in range(mesh_y_length):
-        #     mesh_y.append(mesh_x_y_z[0][mesh_y_index][0][1])
-
-        # for mesh_x_index in range(mesh_x_length):
-        #     mesh_x.append(mesh_x_y_z[0][0][mesh_x_index][0])
-
-        # np.savez(mesh_x_y_z_path, x=mesh_x, y=mesh_y, z=mesh_z)
-
         if zip_output:
-            print("Zipping `npz` folder...")
+            print(f"Zipping `{npz_dir_path}` folder...")
             shutil.make_archive(npz_dir_path, "zip", npz_dir_path)
 
         if delete_source:
-            print("Deleting `chunks` source folder")
+            print(f"Deleting `{chunk_dir_path}` source folder")
             shutil.rmtree(chunk_dir_path)
 
         if delete_output:
-            print("Deleting `npz` output folder")
+            print(f"Deleting `{npz_dir_path}` output folder")
             shutil.rmtree(npz_dir_path)
         
         return self
+
+    # TODO: Clean this up
+    # @staticmethod
+    def df_to_numpy(self, df):
+        dtdx_dtdy_dtdz_timestep = []
+        dtdx_dtdy_dtdz_z = []
+        dtdx_dtdy_dtdz_y = []
+
+        x_y_z_timestep = []
+        x_y_z_z = []
+        x_y_z_y = []
+
+        vx_vy_vz_timestep = []
+        vx_vy_vz_z = []
+        vx_vy_vz_y = []
+
+        keys = ["pressure", "temperature", "melt_region", "temperature_gradient", "liquid_label", "fraction_of_fluid"]
+
+        values = {
+            "timestep": [],
+            "z": [],
+            "y": [],
+        }
+
+        key_values = {}
+        for key in keys:
+            key_values[key] = copy.deepcopy(values)
+
+        prev_z = None
+        prev_y = None
+
+        for i in range(len(df)):
+            row = df.iloc[i]
+
+            z, y = row["z"], row["y"]
+
+            if y != prev_y and prev_y is not None:
+
+                dtdx_dtdy_dtdz_z.append(dtdx_dtdy_dtdz_y)
+                dtdx_dtdy_dtdz_y = []
+
+                x_y_z_z.append(x_y_z_y)
+                x_y_z_y = []
+
+                vx_vy_vz_z.append(vx_vy_vz_y)
+                vx_vy_vz_y = []
+
+                for key in keys:
+                    # print(key, key_values[key]["y"])
+                    key_values[key]["z"].append(key_values[key]["y"])
+                    key_values[key]["y"] = []
+
+            if z != prev_z and prev_z is not None:
+
+                dtdx_dtdy_dtdz_timestep.append(dtdx_dtdy_dtdz_z)
+                dtdx_dtdy_dtdz_z = []
+
+                x_y_z_timestep.append(x_y_z_z)
+                x_y_z_z = []
+
+                vx_vy_vz_timestep.append(vx_vy_vz_z)
+                vx_vy_vz_z = []
+
+                for key in keys:
+                    # print(key, len(key_values[key]["z"]))
+                    key_values[key]["timestep"].append(key_values[key]["z"])
+                    key_values[key]["z"] = []
+
+            dtdx_dtdy_dtdz_y.append([row["dtdx"], row["dtdy"], row["dtdz"]])
+            x_y_z_y.append([row["x"], row["y"], row["z"]])
+            vx_vy_vz_y.append([row["vx"], row["vy"], row["vz"]])
+
+            for key in keys:
+                key_values[key]["y"].append(row[key])
+
+            prev_z = z
+            prev_y = y
+
+        # Adds last value
+        dtdx_dtdy_dtdz_y.append([row["dtdx"], row["dtdy"], row["dtdz"]])
+        x_y_z_y.append([row["x"], row["y"], row["z"]])
+        vx_vy_vz_y.append([row["vx"], row["vy"], row["vz"]])
+        dtdx_dtdy_dtdz_z.append(dtdx_dtdy_dtdz_y)
+
+        x_y_z_z.append(x_y_z_y)
+        vx_vy_vz_z.append(vx_vy_vz_y)
+
+        for key in keys:
+            key_values[key]["y"].append(row[key])
+            key_values[key]["z"].append(key_values[key]["y"])
+
+
+        timestep = {} 
+        for key in keys:
+            timestep[key] = [np.array(key_values[key]["timestep"])]
+
+        other = {
+            "dtdx_dtdy_dtdz": [np.array(dtdx_dtdy_dtdz_timestep)],
+            "x_y_z": [np.array(x_y_z_timestep)],
+            "vx_vy_vz": [np.array(vx_vy_vz_timestep)],
+        }
+
+        return {
+            **timestep,
+            **other,
+        }

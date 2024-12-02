@@ -2,6 +2,8 @@ import math
 
 from decimal import Decimal
 
+# TODO: Create a folder specific to `settings` # (or some better word) and move
+# there.
 class SimulationParameters():
     """
     Class for defining simulation parameters.

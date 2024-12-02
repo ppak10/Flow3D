@@ -1,14 +1,11 @@
 from huggingface_hub import HfApi, upload_folder
 
-version = 0
+hf_api = HfApi()
 
-class HuggingFace():
+class WorkspaceHuggingFace():
     """
-    Huggingface hub related api endpoint methods.
+    Workspace Huggingface hub related api endpoint methods.
     """
-
-    def __init__(self):
-        self.api = HfApi()
     
     def create_repo_and_add_collection_item(
         self,
@@ -23,26 +20,26 @@ class HuggingFace():
         """
 
         # Check if repo exists
-        repo_exists = self.api.repo_exists(repo_id, repo_type=repo_type)
+        repo_exists = hf_api.repo_exists(repo_id, repo_type=repo_type)
 
         if repo_exists:
             if delete_existing:
                 # Delete existing repo on HuggingFace
                 try:
-                    self.api.delete_repo(repo_id, repo_type=repo_type)
+                    hf_api.delete_repo(repo_id, repo_type=repo_type)
                 except Exception as e:
                     # It is possible that this error occurs when repo is renamed.
                     print(e)
             else:
                 return "repo exists"
             
-        repo_url = self.api.create_repo(
+        repo_url = hf_api.create_repo(
             repo_id,
             repo_type=repo_type,
             private=private
         )
 
-        self.api.add_collection_item(
+        hf_api.add_collection_item(
             collection_slug,
             item_id=repo_id,
             item_type=repo_type 

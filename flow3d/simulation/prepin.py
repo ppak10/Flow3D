@@ -81,7 +81,7 @@ class SimulationPrepin():
 
         if self.template_id_type in ["UNS"]:
             # Use the 'material' template folder
-            template_file_path = os.path.join("template", "material", template_filename)
+            template_file_path = os.path.join("simulation", "prepin", "material", template_filename)
             template_resource = files(data).joinpath(template_file_path)
         else:
             warnings.warn(f"Not yet supported")

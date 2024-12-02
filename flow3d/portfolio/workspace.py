@@ -1,3 +1,6 @@
+import os
+import textwrap
+
 from flow3d.workspace import Workspace
 
 class PortfolioWorkspace:
@@ -18,6 +21,16 @@ class PortfolioWorkspace:
             portfolio_path = self.portfolio_path
             
         workspace = Workspace(name=name)
-        workspace.create_workspace(portfolio_path, **kwargs)
+        workspace_path = workspace.create_workspace(portfolio_path, **kwargs)
+
+        # Print `create_workspace` success message.
+        print(textwrap.dedent(f"""
+        Workspace folder `{name}` at `{workspace_path}`.
+        Manage workspace with `manage.py` at `{workspace_path}`
+
+        ```
+        python {os.path.join(workspace_path, "manage.py")}
+        ```
+        """))
 
         return workspace

@@ -1,23 +1,37 @@
 from .base import SimulationBase
+from .huggingface import SimulationHuggingFace
+from .measurements import SimulationMeasurements
 from .name import SimulationName
 from .parameters import SimulationParameters
 from .post_processing import SimulationPostProcessing
 from .prepin import SimulationPrepin
 from .status import SimulationStatus
 from .run import SimulationRun
-from .utils import SimulationUtils
-from .visualization import SimulationVisualization
+from .utils.compression import SimulationUtilsCompression
+from .utils.crop import SimulationUtilsCrop
+from .utils.decorators import SimulationUtilsDecorators
+from .utils.mesh import SimulationUtilsMesh
+from .utils.multiprocessing import SimulationUtilsMultiprocessing
+from .view import SimulationView
+from .visualizations import SimulationVisualizations
 
 class Simulation(
     SimulationBase,
-    SimulationParameters,
+    SimulationHuggingFace,
+    SimulationMeasurements,
     SimulationName,
+    SimulationParameters,
     SimulationPostProcessing,
     SimulationPrepin,
     SimulationRun,
     SimulationStatus,
-    SimulationUtils,
-    SimulationVisualization,
+    SimulationUtilsCompression,
+    SimulationUtilsCrop,
+    SimulationUtilsDecorators,
+    SimulationUtilsMesh,
+    SimulationUtilsMultiprocessing,
+    SimulationView,
+    SimulationVisualizations,
 ):
     def __init__(
         self,

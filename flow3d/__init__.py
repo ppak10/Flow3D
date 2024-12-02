@@ -1,7 +1,3 @@
-# Legacy
-from .flow3d import Flow3D
-from .job import Job
-
-from .simulation import Simulation
 from .portfolio import Portfolio
+from .simulation import Simulation
 from .workspace import Workspace

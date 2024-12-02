@@ -1,14 +1,12 @@
 from .base import JobBase
 from .huggingface import JobHuggingface
 from .utils import JobUtils
-from .visualize import JobVisualize
 from .wandb import JobWandb
 
 class Job(
     JobBase,
     JobHuggingface,
     JobUtils,
-    JobVisualize,
     JobWandb,
 ):
     def __init__(

@@ -1,13 +1,18 @@
 import argparse
+import os
 
-from flow3d import Portfolio
+from flow3d import Workspace
 
-# TODO: Find a better way to do this.
 def parse_value(value):
     """
     Try to convert the value to the most appropriate type.
-    Handles int, float, and string.
+    Handles bool, int, float, and string.
     """
+    value_lower = value.lower()
+    if value_lower in {"true", "yes", "on"}:
+        return True
+    elif value_lower in {"false", "no", "off"}:
+        return False
     try:
         # Try converting to an integer
         return int(value)
@@ -20,25 +25,31 @@ def parse_value(value):
             return value
 
 def main():
-    parser = argparse.ArgumentParser(description="Manage and execute methods for `workspace`.")
+    parser = argparse.ArgumentParser(description="Manage and execute methods for `workspace` and `simulation`.")
     parser.add_argument(
         "method",
-        help="Method within class (e.g., `create_job`).",
-    )
-
-    parser.add_argument(
-        "--portfolio_path",
-        default="/home/flow3d-docker/out",
-        help="Defaults to `/home/flow3d-docker/out`.",
+        help="Method within class (e.g., `create_simulation`).",
     )
 
     parser.add_argument("--verbose", help="Defaults to `False`.", action="store_true")
 
     args, unknown_args = parser.parse_known_args()
 
-    portfolio = Portfolio(
-        portfolio_path = args.portfolio_path,
-        verbose = args.verbose,
+    verbose = args.verbose
+
+    # Sets current directory path of `manage.py` to the workspace.
+    workspace_path = os.path.dirname(__file__)
+
+    workspace_filename = os.path.basename(workspace_path)
+
+    if verbose:
+        print(f"workspace_path: {workspace_path}")
+        print(f"workspace_filename: {workspace_filename}")
+
+    workspace = Workspace(
+        workspace_path=workspace_path,
+        filename=workspace_filename,
+        verbose=verbose,
     )
 
     # Separate positional and keyword arguments
@@ -58,7 +69,7 @@ def main():
 
     # Handle the commands
     try:
-        method = getattr(portfolio, args.method)
+        method = getattr(workspace, args.method)
         method(*positional_args, **kwargs)
     except Exception as e:
         print(f"An error occurred: {e}")

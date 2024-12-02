@@ -1,7 +1,11 @@
 import os
+import shutil
 import textwrap
 
 from datetime import datetime
+from importlib.resources import files
+
+from flow3d import data
 
 class WorkspaceBase:
     """
@@ -11,11 +15,13 @@ class WorkspaceBase:
             self,
             name: str = None,
             filename: str = None,
+            workspace_path = None,
             verbose = False,
             **kwargs,
         ):
         self.set_name(name, filename)
-        self.workspace_path = None
+
+        self.workspace_path = workspace_path
         self.verbose = verbose
 
         super().__init__(**kwargs)
@@ -41,7 +47,9 @@ class WorkspaceBase:
 
     def create_workspace(self, portfolio_path):
         """
-        Creates folder to store data related to Flow3D job.
+        Called by Portfolio `manage.py`
+        Creates folder to store data related to Flow3D workspace.
+
         @param portfolio_dir: Portfolio directory
         """
             
@@ -56,5 +64,13 @@ class WorkspaceBase:
             Following operations may overwrite existing files within folder.
             """)
             print(warning)
+
+        # Copy over `manage.py` file to created workspace.
+        resource_path = os.path.join("workspace", "manage.py")
+        manage_py_resource_path = files(data).joinpath(resource_path)
+        manage_py_workspace_path = os.path.join(self.workspace_path, "manage.py")
+        shutil.copy(manage_py_resource_path, manage_py_workspace_path)
+
+        # TODO: Generate workspace .xml
 
         return self.workspace_path
