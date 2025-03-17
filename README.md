@@ -14,9 +14,9 @@ pip install Flow3D
 flow3d-manage create_workspace test
 ```
 
-3. Navigate to workspace directory and `manage.py` file
-```
-python manage.py
+3. Navigate to created workspace directory and use package with `manage.py` file.
+```bash
+cd out/test
 ```
 
 ## Workspace `manage.py` Usage
