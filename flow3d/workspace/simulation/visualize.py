@@ -1,5 +1,6 @@
 import multiprocessing
 import os
+import pickle
 
 from tqdm import tqdm
 
@@ -10,6 +11,24 @@ class WorkspaceSimulationVisualize:
     """
     Workspace class providing methods to visualize simulations. 
     """
+
+    def simulation_visualize(self, name, num_proc = 1):
+        simulation_folder = os.path.join(self.workspace_path, name)
+        simulation_pkl_path = os.path.join(simulation_folder, f"simulation.pkl")
+        with open(simulation_pkl_path, "rb") as file:
+            simulation = pickle.load(file)
+
+        simulation.prepare_views(working_dir = simulation_folder)
+        simulation.generate_views(
+            working_dir = simulation_folder,
+            num_proc = num_proc
+        )
+
+        simulation.prepare_view_visualizations(working_dir = simulation_folder)
+        simulation.generate_views_visualizations(
+            working_dir = simulation_folder,
+            num_proc = num_proc
+        )
 
     @WorkspaceUtils.with_simulations
     def visualize_all_prepare_view_visualizations(self, num_proc = 1, skip_checks = False, **kwargs):

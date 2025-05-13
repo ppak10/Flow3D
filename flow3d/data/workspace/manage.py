@@ -1,4 +1,5 @@
 import argparse
+import ast
 import os
 
 from flow3d import Workspace
@@ -14,15 +15,9 @@ def parse_value(value):
     elif value_lower in {"false", "no", "off"}:
         return False
     try:
-        # Try converting to an integer
-        return int(value)
-    except ValueError:
-        try:
-            # Try converting to a float
-            return float(value)
-        except ValueError:
-            # Return as string if neither int nor float
-            return value
+        return ast.literal_eval(value)
+    except (ValueError, SyntaxError):
+        return value.strip()  # Return as string if it can't be parsed
 
 def main():
     parser = argparse.ArgumentParser(description="Manage and execute methods for `workspace` and `simulation`.")

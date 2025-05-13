@@ -71,7 +71,7 @@
     ifst=2,
     imu1=1,
     ipgauge=0, remark='pressure type',
-    t_reference=299.15,
+    t_reference=<TEMPERATURE_INITIAL>,
  /
 
  &scalar
@@ -92,34 +92,34 @@
  &bcdata
     remark='!! Boundary condition X Min',
     ibct(1)=2,
-    tbct(1, 1)=299.15,
+    tbct(1, 1)=<TEMPERATURE_INITIAL>,
     ihtbct(1)=0,
 
     remark='!! Boundary condition X Max',
     ibct(2)=2,
-    tbct(1, 2)=299.15,
+    tbct(1, 2)=<TEMPERATURE_INITIAL>,
     ihtbct(2)=0,
 
     remark='!! Boundary condition Y Min',
     ibct(3)=2,
-    tbct(1, 3)=299.15,
+    tbct(1, 3)=<TEMPERATURE_INITIAL>,
     ihtbct(3)=0,
 
     remark='!! Boundary condition Y Max',
     ibct(4)=2,
-    tbct(1, 4)=299.15,
+    tbct(1, 4)=<TEMPERATURE_INITIAL>,
     ihtbct(4)=0,
 
     remark='!! Boundary condition Z Min',
     ibct(5)=2,
-    tbct(1, 5)=299.15,
+    tbct(1, 5)=<TEMPERATURE_INITIAL>,
     ihtbct(5)=0,
 
     remark='!! Boundary condition Z Max',
     ibct(6)=5,
     pbct(1, 6)=1.013e+06,
     fbct(1, 6)=0,
-    tbct(1, 6)=299.15,
+    tbct(1, 6)=<TEMPERATURE_INITIAL>,
     ihtbct(6)=0,
 
  /
@@ -170,14 +170,14 @@
     yvr(1)=0.03, remark='Y Location of Void Pointer',
     zvr(1)=0.05, remark='Z Location of Void Pointer',
     pvrd(1, 1)=1.0130e+06, remark= 'Pressure',
-    tvrd(1, 1)=299.15, remark= 'Temperature',
+    tvrd(1, 1)=<TEMPERATURE_INITIAL>, remark= 'Temperature',
 
     remark='!! Region Pointer common parameters',
     pvoid=1.0130e+06, remark='Default Void Initial Vapor Pressure',
     presi=1.0130e+06, remark='Uniform Pressure',
     iflinittyp=0, remark='Fluid Initialization',
-    tempi=299.15, remark='Uniform Initial Temperature',
-    tvoid=299.15, remark='Constant Uniform void-region temperature',
+    tempi=<TEMPERATURE_INITIAL>, remark='Uniform Initial Temperature',
+    tvoid=<TEMPERATURE_INITIAL>, remark='Constant Uniform void-region temperature',
     igivht=1, remark='Global flag for void heat transfer type',
     remark= 'Void Pointer 1',
  /

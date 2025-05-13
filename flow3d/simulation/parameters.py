@@ -1,6 +1,10 @@
 import math
+import os
+import yaml
 
 from decimal import Decimal
+
+from flow3d.simulation.utils.decorators import SimulationUtilsDecorators
 
 # TODO: Create a folder specific to `settings` # (or some better word) and move
 # there.
@@ -23,6 +27,7 @@ class SimulationParameters():
             # Process
             "power": 100,                       # 100 Watts
             "velocity": 1.0,                    # 1 m/s
+            "temperature_initial": 299.15,      # 299.15 Kelvin
 
             # Mesh
             "mesh_size": 2E-5,                  # 20 µm
@@ -82,7 +87,31 @@ class SimulationParameters():
         # Set the domain to smaller of the two
         self.mesh_x_end = min(x, self.mesh_x_end)
         self.fluid_region_x_end = min(x, self.fluid_region_x_end)
-        
+
+    # Consider moving this to prepin.py
+    @SimulationUtilsDecorators.change_working_directory
+    def load_config(self, config_file="simulation.yml", **kwargs):
+        def apply_config(config, prefix=""):
+            for key, value in config.items():
+                attr_name = f"{prefix}_{key}" if prefix else key
+                if isinstance(value, dict):
+                    apply_config(value, prefix=attr_name)
+                else:
+                    old_value = getattr(self, attr_name, "(not set)")
+                    old_type = type(old_value).__name__ if old_value != "(not set)" else "N/A"
+                    new_type = type(value).__name__
+
+                    if self.verbose: 
+                        print(f"Before: self.{attr_name} = {old_value} (type: {old_type})")
+                    setattr(self, attr_name, value)
+                    if self.verbose: 
+                        print(f"After : self.{attr_name} = {getattr(self, attr_name)} (type: {new_type})")
+
+        with open(config_file, "r") as f:
+            config = yaml.safe_load(f)
+            apply_config(config)
+            self.prepin_file_content = self.build_from_template()
+
 
     def cgs(self, parameter: str):
         """
@@ -104,7 +133,7 @@ class SimulationParameters():
             # Issues at 5 µm (0.0005) rounding to 10 µm (0.0010)
             parameter_decimal = Decimal(getattr(self, parameter) * 1E2)
             return float(round(parameter_decimal, 4))
-        elif parameter in ["simulation_finish_time", "evaporation"]:
+        elif parameter in ["simulation_finish_time", "evaporation", "temperature_initial"]:
             # Keep units and datatype the same
             return getattr(self, parameter)
         else:

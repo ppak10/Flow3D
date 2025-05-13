@@ -1,20 +1,22 @@
 from .base import WorkspaceBase
+from .simulation.base import WorkspaceSimulationBase
 from .simulation.huggingface import WorkspaceSimulationHuggingFace
 from .simulation.measure import WorkspaceSimulationMeasure
 from .simulation.post import WorkspaceSimulationPost
 from .simulation.prepin import WorkspaceSimulationPrepin
-from .simulation.simulate import WorkspaceSimulationSimulate
+from .simulation.run import WorkspaceSimulationRun
 from .simulation.view import WorkspaceSimulationView
 from .simulation.visualize import WorkspaceSimulationVisualize
 from .utils import WorkspaceUtils
 
 class Workspace(
     WorkspaceBase,
+    WorkspaceSimulationBase,
     WorkspaceSimulationHuggingFace,
     WorkspaceSimulationMeasure,
     WorkspaceSimulationPost,
     WorkspaceSimulationPrepin,
-    WorkspaceSimulationSimulate,
+    WorkspaceSimulationRun,
     WorkspaceSimulationView,
     WorkspaceSimulationVisualize,
     WorkspaceUtils,

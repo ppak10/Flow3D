@@ -39,6 +39,7 @@ class SimulationName():
         self,
         power = None,
         velocity = None,
+        temperature_initial = None,
         beam_diameter = None,
         mesh_size = None
     ):
@@ -52,6 +53,11 @@ class SimulationName():
         else:
             v = f"{self.velocity}".zfill(4)
 
+        if temperature_initial is not None:
+            t_i = f"{float(temperature_initial)}".zfill(6)
+        else:
+            t_i = f"{self.temperature_initial}".zfill(6)
+
         if beam_diameter is not None:
             b_d = f"{Decimal(beam_diameter):.1E}".zfill(5)
         else:
@@ -62,6 +68,6 @@ class SimulationName():
         else:
             m_s = f"{Decimal(self.mesh_size):.1E}".zfill(5)
 
-        return f"0_{p}_{v}_{b_d}_{m_s}"
+        return f"0_{p}_{v}_{t_i}_{b_d}_{m_s}"
     
     # TODO: Add class to turn name to parameters

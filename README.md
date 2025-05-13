@@ -1,7 +1,7 @@
 ![pytest](https://github.com/ppak10/Flow3D/workflows/pytest/badge.svg)
 
 # Flow3D
-Python wrapper for FLOW-3D
+Python wrapper for running and managing simulations in FLOW-3D
 
 ## Getting Started
 1. Installation
@@ -20,21 +20,44 @@ cd out/test
 ```
 
 ## Workspace `manage.py` Usage
-### 1. Initialize Simulation folders with prepin file(s)
-#### Single Simulation
+### 1. Initialize Simulation folders and `simulation.yml` file.
+```bash
+python manage.py simulation_init example_simulation
+```
+
+### 2. Edit generated `simulation.yml` file to your specific configurations
+### 3. Generate prepin file from `simulation.yml`
+```bash
+python manage.py simulation_generate_prepin example_simulation
+```
+
+<!-- #### Single Simulation
 ```bash
 python manage.py prepin
-```
+``` -->
 
-#### Process Map of Simulations
+<!-- #### Process Map of Simulations
 ```bash
 python manage.py prepin_process_map
-```
+``` -->
 
-### 2. Run Simulations
-#### Run all Simulations within Workspace
+### 4. Run Simulation
+<!-- #### Run all Simulations within Workspace
 ```bash
 python manage.py simulate_all
+``` -->
+```bash
+python manage.py simulation_run example_simulation
+```
+
+### 5. Postprocess Simulations
+```bash
+python manage.py simulation_postprocess example_simulation
+```
+
+### 6. Visualize Simulations
+```bash
+python manage.py simulation_visualize example_simulation num_proc=4
 ```
 
 ### 3. Post Process Simulations
@@ -54,14 +77,24 @@ python manage.py post_all_flslnk_chunks_to_npz
 ```
 
 ### 4. Visualize Simulations
+#### Prepare views for all simulations within workspace
+```bash
+python manage.py view_all_prepare_views num_proc=8
+```
+
+#### Generate views for all simulations within workspace
+```bash
+python manage.py view_all_generate_views num_proc=8
+```
+
 #### Prepare visualization views for all simulations within workspace
 ```bash
-python manage.py visualize_all_prepare_views
+python manage.py visualize_all_prepare_view_visualizations
 ```
 
 #### Generate visualization views for all simulations within workspace
 ```bash
-python manage.py visualize_all_generate_views
+python manage.py visualize_all_generate_views_visualizations
 ```
 
 ### 5. Upload Simulations to HuggingFace

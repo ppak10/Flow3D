@@ -17,10 +17,11 @@ from .visualizations import SimulationVisualizations
 
 class Simulation(
     SimulationBase,
+    SimulationParameters,
+
     SimulationHuggingFace,
     SimulationMeasurements,
     SimulationName,
-    SimulationParameters,
     SimulationPostProcessing,
     SimulationPrepin,
     SimulationRun,
@@ -38,7 +39,7 @@ class Simulation(
         version: float = 0,
         name: str = None,
         filename: str = "simulation",
-        use_adaptive_domain: bool = True,
+        use_adaptive_domain: bool = False,
         use_template: bool = True,
         verbose: bool = False,
         **kwargs,

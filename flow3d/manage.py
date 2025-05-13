@@ -1,23 +1,13 @@
 import argparse
+import ast
 
 from flow3d import Portfolio
 
-# TODO: Find a better way to do this.
 def parse_value(value):
-    """
-    Try to convert the value to the most appropriate type.
-    Handles int, float, and string.
-    """
     try:
-        # Try converting to an integer
-        return int(value)
-    except ValueError:
-        try:
-            # Try converting to a float
-            return float(value)
-        except ValueError:
-            # Return as string if neither int nor float
-            return value
+        return ast.literal_eval(value)
+    except (ValueError, SyntaxError):
+        return value.strip()  # Return as string if it can't be parsed
 
 def main():
     parser = argparse.ArgumentParser(description="Manage and execute methods for `workspace`.")

@@ -1,18 +1,28 @@
 import multiprocessing
 import os
+import pickle
 
 from tqdm import tqdm
 
 from flow3d.workspace.utils import WorkspaceUtils
 
 #TODO: There may be a better way to handle the naming convention here
-#TODO: Rename file to `post_process` so that it matches the rest of the
+#TODO: Rename file to `postprocess` so that it matches the rest of the
 # files which are verbs.
 class WorkspaceSimulationPost:
     """
     Workspace class providing methods to run post processing methods for
     simulation(s).
     """
+    def simulation_postprocess(self, name):
+        simulation_folder = os.path.join(self.workspace_path, name)
+        s_pkl_path = os.path.join(simulation_folder, f"simulation.pkl")
+        with open(s_pkl_path, "rb") as file:
+            simulation = pickle.load(file)
+
+        simulation.guipost(working_dir = simulation_folder)
+        simulation.chunk_flslnk(working_dir = simulation_folder)
+        simulation.flslnk_chunk_to_npz(working_dir = simulation_folder)
 
     @WorkspaceUtils.with_simulations
     def post_all_run_guipost(self, num_proc = 1, skip_checks = False, **kwargs):
