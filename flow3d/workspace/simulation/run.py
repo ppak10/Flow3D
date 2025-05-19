@@ -49,7 +49,19 @@ class WorkspaceSimulationRun:
 
         pass
 
-    def simulation_run_all(self, use_wandb = False, **kwargs):
+    def simulation_run_all(self, name, num_proc=1, use_wandb = False, **kwargs):
+        """
+        Runs the simulation along with queuing the postprocessing and
+        visualization code immediately afterwards.
+        """
+
+        self.simulation_run(name, use_wandb, **kwargs)
+        self.simulation_postprocess(name)
+        self.simulation_visualize(name, num_proc=num_proc)
+        self.simulation_generate_dataset(name)
+
+
+    def simulations_run_all(self, use_wandb = False, **kwargs):
         """
         Method to run all simulations within a workspace folder.
         """

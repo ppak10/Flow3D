@@ -15,22 +15,22 @@ spot_radius: 5.0e-5              # 50 µm
 mesh:
   size: 2.0e-5      # 20 µm resolution
   x_start: 0      # 0 µm
-  x_end: 3.0e-3     # 3000 µm
+  x_end: 1.0e-3     # 1000 µm
   y_start: 0      # 0 µm
-  y_end: 1.0e-3     # 1000 µm
-  z_start: 0      # 0 µm
-  z_end: 6.0e-4     # 600 µm
-
-fluid_region:
-  x_start: 0      # 0 µm
-  x_end: 3.0e-3     # 3000 µm
-  y_start: 0      # 0 µm
-  y_end: 1.0e-3     # 1000 µm
+  y_end: 5.0e-4     # 500 µm
   z_start: 0      # 0 µm
   z_end: 4.0e-4     # 400 µm
 
+fluid_region:
+  x_start: 0      # 0 µm
+  x_end: 1.0e-3     # 1000 µm
+  y_start: 0      # 0 µm
+  y_end: 5.0e-4     # 500 µm
+  z_start: 0      # 0 µm
+  z_end: 2.0e-4     # 200 µm
+
 beam:
   diameter: 1.0e-4  # 100 µm (not explicity in prepin file, rather calculated)
-  x: 3.0e-4         # Starting Location of Laser Beam 300 µm (0.03 cm)
-  y: 5.0e-4         # Starting Location of Laser Beam 500 µm (0.05 cm)
+  x: 5.0e-5         # Starting Location of Laser Beam 50 µm (0.005 cm)
+  y: 2.5e-4         # Starting Location of Laser Beam 250 µm (0.05 cm)
   z: 0.01         # Starting Location of Laser Beam 10,000 µm (1.00 cm)

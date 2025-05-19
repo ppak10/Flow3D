@@ -25,7 +25,11 @@ class WorkspaceSimulationBase:
             os.makedirs(simulation_path)
 
         # Copy over default `simulation.yml` file
-        config_resource_file_path = os.path.join("simulation", "config", "simulation.yml")
+        config_file = "default.yml"
+        if name == "test":
+            config_file = "test.yml"
+
+        config_resource_file_path = os.path.join("simulation", "config", config_file)
         config_resource = files(data).joinpath(config_resource_file_path)
 
         config_file_path = os.path.join(simulation_path, "simulation.yml")

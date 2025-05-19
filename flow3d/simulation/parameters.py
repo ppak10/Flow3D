@@ -1,5 +1,4 @@
 import math
-import os
 import yaml
 
 from decimal import Decimal
@@ -17,9 +16,9 @@ class SimulationParameters():
         # Valid parameters to pass to class as **kwargs (meter-gram-second).
         self.default_parameters = {
             # Custom
-            "adaptive_domain_padding_x": 5E-5,  # 50 µm
-            "adaptive_domain_padding_y": 5E-5,  # 50 µm
-            "adaptive_domain_padding_z": 5E-5,  # 50 µm
+            # "adaptive_domain_padding_x": 5E-5,  # 50 µm
+            # "adaptive_domain_padding_y": 5E-5,  # 50 µm
+            # "adaptive_domain_padding_z": 5E-5,  # 50 µm
 
             # Global
             "simulation_finish_time": 0.001,    # 0.001 Seconds
@@ -28,6 +27,9 @@ class SimulationParameters():
             "power": 100,                       # 100 Watts
             "velocity": 1.0,                    # 1 m/s
             "temperature_initial": 299.15,      # 299.15 Kelvin
+            "evaporation": 0,                   # 0 for Antoine, 1 for integral
+            "lens_radius": 5E-5,                # 50 µm
+            "spot_radius": 5E-5,                # 50 µm
 
             # Mesh
             "mesh_size": 2E-5,                  # 20 µm
@@ -57,10 +59,9 @@ class SimulationParameters():
             "beam_y": 5E-4,                     # 500 µm (0.05 cm)
             "beam_z": 0.01,                     # 10,000 µm (1.00 cm)
             "beam_diameter": 1E-4,              # 100 µm (not explicity in prepin file)
-            "lens_radius": 5E-5,                # 50 µm
-            "spot_radius": 5E-5,                # 50 µm
+
+            # Other
             "gauss_beam": 5E-5 / math.sqrt(2),  # 50 / √2 µm 
-            "evaporation": 0,                   # 0 for Antoine, 1 for integral
         }
 
         # Sets default parameters
@@ -72,21 +73,23 @@ class SimulationParameters():
             setattr(self, key, value)
 
         # Set mesh and fluid domain size based expected size of the melt pool.
-        if self.use_adaptive_domain:
-            self.set_adaptive_domain()
+        # if self.use_adaptive_domain:
+        #     self.set_adaptive_domain()
 
         super().__init__(**kwargs)
 
-    def set_adaptive_domain(self):
-        """
-        Sets the mesh and fluid regions based on expected melt pool size.
-        """
-        expected_travel_x = self.velocity * self.simulation_finish_time
-        x = expected_travel_x + self.adaptive_domain_padding_x + self.beam_x
+    # TODO: Implement better and then uncomment.
+    # Right now the adaptive domain cut off incorrectly
+    # def set_adaptive_domain(self):
+    #     """
+    #     Sets the mesh and fluid regions based on expected melt pool size.
+    #     """
+    #     expected_travel_x = self.velocity * self.simulation_finish_time
+    #     x = expected_travel_x + self.adaptive_domain_padding_x + self.beam_x
 
-        # Set the domain to smaller of the two
-        self.mesh_x_end = min(x, self.mesh_x_end)
-        self.fluid_region_x_end = min(x, self.fluid_region_x_end)
+    #     # Set the domain to smaller of the two
+    #     self.mesh_x_end = min(x, self.mesh_x_end)
+    #     self.fluid_region_x_end = min(x, self.fluid_region_x_end)
 
     # Consider moving this to prepin.py
     @SimulationUtilsDecorators.change_working_directory

@@ -84,7 +84,6 @@ class SimulationHuggingFace():
         delete_source = True,
         **kwargs
     ):
-
         # Unzip dataset files
         if not os.path.exists(dataset_path):
             if os.path.exists(f"{dataset_path}.zip"):
@@ -97,38 +96,16 @@ class SimulationHuggingFace():
         # Load dataset from disk
         dataset = load_from_disk(dataset_path, keep_in_memory=keep_in_memory)
 
-        # Create Huggingface Dataset (if non-existant)
-        repo_exists = hf_api.repo_exists(repo_id = dataset_id, repo_type="dataset")
-
-        if repo_exists:
-            # TODO: Figure out if `delete_existing` should be implemented here.
-            # if delete_existing:
-            #     # Delete existing repo on HuggingFace
-            #     try:
-            #         hf_api.delete_repo(repo_id, repo_type=repo_type)
-            #     except Exception as e:
-            #         # It is possible that this error occurs when repo is renamed.
-            #         print(e)
-            # else:
-            #     return "repo exists"
-            pass
-        
-        else:
-            repo_url = hf_api.create_repo(
-                repo_id = dataset_id,
-                repo_type = "dataset",
-                # private=private
-            )
-            print(f"Created new dataset at: {repo_url}")
-
         if config_name is None:
             config_name = self.name
 
         if split is None:
             split = self.filename
 
-        dataset.push_to_hub(
+        data_dir = os.path.join("data", config_name)
+        response = dataset.push_to_hub(
             dataset_id,
+            data_dir = data_dir,
             config_name = config_name,
             split = split,
         )
@@ -137,71 +114,6 @@ class SimulationHuggingFace():
             print(f"Deleting `{dataset_path}` source folder")
             shutil.rmtree(dataset_path)
 
-    @SimulationUtilsDecorators.change_working_directory 
-    def upload_flslnk_dataset(
-        self,
-
-        # `dataset.push_to_hub`
-        dataset_id,
-        config_name = None,
-        split = None,
-
-        # `load_from_disk`
-        dataset_path = "flslnk_dataset",
-        keep_in_memory = None,
-
-        delete_source = True,
-        **kwargs
-    ):
-
-        # Unzip dataset files
-        if not os.path.exists(dataset_path):
-            if os.path.exists(f"{dataset_path}.zip"):
-                os.makedirs(dataset_path)
-                with zipfile.ZipFile(f"{dataset_path}.zip", "r") as zip_ref:
-                    zip_ref.extractall(dataset_path)
-            else:
-                raise FileNotFoundError(f"`{dataset_path}.zip` file not found")
-
-        # Load dataset from disk
-        dataset = load_from_disk(dataset_path, keep_in_memory=keep_in_memory)
-
-        # Create Huggingface Dataset (if non-existant)
-        repo_exists = hf_api.repo_exists(repo_id = dataset_id, repo_type="dataset")
-
-        if repo_exists:
-            # TODO: Figure out if `delete_existing` should be implemented here.
-            # if delete_existing:
-            #     # Delete existing repo on HuggingFace
-            #     try:
-            #         hf_api.delete_repo(repo_id, repo_type=repo_type)
-            #     except Exception as e:
-            #         # It is possible that this error occurs when repo is renamed.
-            #         print(e)
-            # else:
-            #     return "repo exists"
-            pass
-        
-        else:
-            repo_url = hf_api.create_repo(
-                repo_id = dataset_id,
-                repo_type = "dataset",
-                # private=private
-            )
-            print(f"Created new dataset at: {repo_url}")
-
-        if config_name is None:
-            config_name = self.name
-
-        if split is None:
-            split = self.filename
-
-        dataset.push_to_hub(
-            dataset_id,
-            config_name = config_name,
-            split = split,
-        )
-
-        if delete_source:
-            print(f"Deleting `{dataset_path}` source folder")
-            shutil.rmtree(dataset_path)
+        # Should return url to commit
+        # i.e. https://huggingface.co/datasets/ppak10/residual_heat/commit/ed05a1ebd48f86feb9bb274e7c43f736b2fa2168
+        return response

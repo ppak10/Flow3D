@@ -20,7 +20,8 @@ COLUMNS_CONFIG = {
     "temperature": {
         "cmap": "plasma",
         # "clim": [1873, 5000], # Ti-6Al-4V
-        "clim":[1697, 3000], # SS316L
+        # "clim":[1697, 3000], # SS316L
+        "clim":[1000, 3000], # SS316L
         "title": "Temperature"
     },
     "fraction_of_fluid": {

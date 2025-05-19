@@ -1,17 +1,59 @@
 import multiprocessing
 import os
 import time
+import pickle
+import re
 
 from huggingface_hub import upload_folder
 from tqdm import tqdm
 
 from flow3d.workspace.utils import WorkspaceUtils
 
-#TODO: There may be a better way to handle the naming convention here
 class WorkspaceSimulationHuggingFace:
     """
     Workspace class providing methods to visualize simulations. 
     """
+
+    def simulation_generate_dataset(self, name, **kwargs):
+        simulation_folder = os.path.join(self.workspace_path, name)
+        simulation_pkl_path = os.path.join(simulation_folder, f"simulation.pkl")
+        with open(simulation_pkl_path, "rb") as file:
+            simulation = pickle.load(file)
+
+        simulation.create_flslnk_dataset(working_dir = simulation_folder, **kwargs)
+    
+    def simulation_upload_dataset(self, name, dataset_id=None, **kwargs):
+        simulation_folder = os.path.join(self.workspace_path, name)
+        simulation_pkl_path = os.path.join(simulation_folder, f"simulation.pkl")
+        with open(simulation_pkl_path, "rb") as file:
+            simulation = pickle.load(file)
+
+        if dataset_id == None:
+            dataset_id = self.filename
+
+        response = simulation.upload_flslnk_dataset(
+            dataset_id,
+            working_dir = simulation_folder,
+            **kwargs
+        )
+
+        # Use regex to extract the dataset path
+        match = re.search(r'datasets/([^/]+/[^/]+)', response)
+        if match:
+            repo_id = match.group(1)
+            print(f"Uploading source files to repo with id: {repo_id}")
+        else:
+            print("Dataset path not found.")
+
+        path_in_repo = os.path.join('source', simulation.name)
+        upload_url = upload_folder(
+            repo_id = repo_id,
+            folder_path = simulation_folder,
+            path_in_repo = path_in_repo,
+            repo_type = "dataset"
+        )
+
+        return upload_url
 
     @WorkspaceUtils.with_simulations
     def huggingface_all_create_flslnk_dataset(

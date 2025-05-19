@@ -1,4 +1,5 @@
 from .base import WorkspaceBase
+from .huggingface import WorkspaceHuggingFace
 from .simulation.base import WorkspaceSimulationBase
 from .simulation.huggingface import WorkspaceSimulationHuggingFace
 from .simulation.measure import WorkspaceSimulationMeasure
@@ -11,6 +12,7 @@ from .utils import WorkspaceUtils
 
 class Workspace(
     WorkspaceBase,
+    WorkspaceHuggingFace,
     WorkspaceSimulationBase,
     WorkspaceSimulationHuggingFace,
     WorkspaceSimulationMeasure,

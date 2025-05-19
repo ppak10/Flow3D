@@ -1,15 +1,13 @@
 import os
 import pickle
 
-from flow3d.simulation import Simulation
-
 class WorkspaceSimulationPrepin:
     """
     Workspace class providing methods for initializing simulation folders and
     prepin files.
     """
 
-    def simulation_generate_prepin(self, name, config_file="simulation.yml", **kwargs):
+    def simulation_build(self, name, config_file="simulation.yml", **kwargs):
         """
         Creates prepin file from simulation.yml
         """
@@ -29,33 +27,10 @@ class WorkspaceSimulationPrepin:
         with open(simulation_prepin_path, "w") as file:
             file.write(simulation.prepin_file_content)
 
-    # def prepin(self, **kwargs):
-    #     """
-    #     Create prepin file within simulation folder for a specified workspace
-    #     """
-
-    #     simulation = Simulation(**kwargs)
-
-    #     # Create simulation folder within workspace path 
-    #     simulation_path = os.path.join(self.workspace_path, simulation.name)
-    #     if not os.path.isdir(simulation_path):
-    #         os.makedirs(simulation_path)
-
-    #     # Save simulation class object to pickle file
-    #     simulation_pkl_path = os.path.join(simulation_path, f"{simulation.filename}.pkl")
-    #     with open(simulation_pkl_path, "wb") as file:
-    #         pickle.dump(simulation, file)
-        
-    #     # Creates prepin file inside simulation job folder
-    #     simulation_prepin_filename = f"prepin.{simulation.filename}"
-    #     simulation_prepin_path = os.path.join(simulation_path, simulation_prepin_filename)
-
-    #     # Write prepin file as "prepin.simulation"
-    #     with open(simulation_prepin_path, "w") as file:
-    #         file.write(simulation.prepin_file_content)
-
-    #     return simulation
-    
+        # Save simulation class object to pickle file
+        simulation_pkl_path = os.path.join(simulation_path, f"{simulation.filename}.pkl")
+        with open(simulation_pkl_path, "wb") as file:
+            pickle.dump(simulation, file)
 
     def prepin_process_map(
             self,

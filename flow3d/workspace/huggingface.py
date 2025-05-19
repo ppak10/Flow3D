@@ -6,6 +6,30 @@ class WorkspaceHuggingFace():
     """
     Workspace Huggingface hub related api endpoint methods.
     """
+
+    def workspace_dataset_initialize(self,
+                                     dataset_id=None,
+                                     private=False,
+                                     format="huggingface",
+                                     ):
+
+        # Create Huggingface Dataset (if non-existant)
+        if dataset_id == None:
+            dataset_id = self.filename
+
+        if format == "huggingface":
+            # TODO: Implement check for existing repo.
+            # Will need to dataset_id with org or user id in order to make this
+            # work properly.
+            # repo_exists = hf_api.repo_exists(repo_id = dataset_id, repo_type="dataset")
+            repo_url = hf_api.create_repo(
+                repo_id = dataset_id,
+                repo_type = "dataset",
+                private=private
+            )
+            print(f"Created new dataset at: {repo_url}")
+
+    workspace_dataset_init = workspace_dataset_initialize
     
     def create_repo_and_add_collection_item(
         self,
