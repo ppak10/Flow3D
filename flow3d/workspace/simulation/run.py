@@ -49,7 +49,7 @@ class WorkspaceSimulationRun:
 
         pass
 
-    def simulation_run_all(self, name, num_proc=1, use_wandb = False, **kwargs):
+    def simulation_run_all(self, name, num_proc=1, use_wandb = False, upload = False, **kwargs):
         """
         Runs the simulation along with queuing the postprocessing and
         visualization code immediately afterwards.
@@ -59,6 +59,8 @@ class WorkspaceSimulationRun:
         self.simulation_postprocess(name)
         self.simulation_visualize(name, num_proc=num_proc)
         self.simulation_generate_dataset(name)
+        if upload:
+            self.simulation_upload_dataset(name)
 
 
     def simulations_run_all(self, use_wandb = False, **kwargs):

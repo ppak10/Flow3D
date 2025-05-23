@@ -90,25 +90,13 @@ python manage.py simulation_run_all example_simulation
     ```bash
     python manage.py simulation_generate_dataset example_simulation
     ```
+    #### 4.5. (upload=True) Upload Simulation and source files. (defaults to HuggingFace)
+    ```bash
+    python manage.py simulation_upload_dataset example_simulation
+    ```
 
 ### 5. Create Workspace HuggingFace Dataset
 #### Initialize a dataset for the workspace (defaults to HuggingFace)
 ```bash
 python manage.py workspace_dataset_init
 ```
-
-### 6. Upload Simulation and source files.
-#### Initialize a dataset for the workspace (defaults to HuggingFace)
-```bash
-python manage.py simulation_upload_dataset example_simulation
-```
-
-<!-- #### Upload created `flslnk` HuggingFace dataset
-```bash
-python manage.py huggingface_all_upload_flslnk_dataset dataset_id=<DATASET_ID>
-```
-
-#### Upload all Workspace files to HuggingFace
-```bash
-python manage.py huggingface_all_upload_folder dataset_id=<DATASET_ID>
-``` -->
